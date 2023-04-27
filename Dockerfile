@@ -3,8 +3,8 @@ FROM ubuntu:22.04
 ARG ZSDK_VERSION=0.15.0
 ARG PYTHON_VERSION=3.10
 
-ARG UID=1000
-ARG GID=1000
+ARG UID=1001
+ARG GID=1001
 
 #
 # --- General ---
@@ -49,6 +49,14 @@ RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zep
     cd /opt/zephyr-sdk-${ZSDK_VERSION} && \
     ./setup.sh -t x86_64-zephyr-elf -t arm-zephyr-eabi -h
 
+#
+# --- Chrome (for Selenium Tests)
+#
+RUN wget -q --show-progress --progress=bar:force:noscroll https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm ./google-chrome-stable_current_amd64.deb
+
 # Install Python dependencies
 RUN python3 -m pip install -U pip && \
   pip3 install west cryptography
@@ -73,8 +81,9 @@ RUN apt-get install -y minicom
 # # --- ENVIRONMENT ---
 # #
 
-ENV WEST_WORKSPACE_CONTAINER=/opt/zephyrproject
-ENV ZEPHYR_BASE=$WEST_WORKSPACE_CONTAINER/zephyr
+#Dont set ZEPHYR_BASE as it is dependent on the west_workspace
+#ENV WEST_WORKSPACE_CONTAINER=/opt/zephyrproject
+#ENV ZEPHYR_BASE=$WEST_WORKSPACE_CONTAINER/zephyr
 ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
 ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 
