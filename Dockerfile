@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 ARG ZSDK_VERSION=0.15.0
 ARG PYTHON_VERSION=3.10
+ARG DOXYGEN_VERSION=1.9.7
 
 ARG UID=1000
 ARG GID=1000
@@ -42,6 +43,12 @@ RUN apt update && apt install -y --no-install-recommends doxygen && apt clean
 
 RUN mkdir -p /opt
 
+# Install Doxygen
+RUN wget -q --show-progress --progress=bar:force:noscroll https://www.doxygen.nl/files/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && \
+  tar xvf doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz -C /opt/ &&\
+  rm doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && \
+  cd /opt/doxygen-1.9.7 && \
+  make install
 
 # Zephyr SDK toolchain
 RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz && \
