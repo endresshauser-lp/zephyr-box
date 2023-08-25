@@ -50,6 +50,10 @@ RUN wget -q --show-progress --progress=bar:force:noscroll https://www.doxygen.nl
   cd /opt/doxygen-1.9.7 && \
   make install
 
+# Sphinx installation
+RUN python3 pip install sphinx breathe \
+  sphinx_rtd_theme sphinx_sitemap sphinxcontrib_mermaid sphinxcontrib_plantuml myst_parser
+
 # Zephyr SDK toolchain
 RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz && \
     wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/sha256.sum | shasum --check --ignore-missing && \
