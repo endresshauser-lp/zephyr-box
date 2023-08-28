@@ -51,7 +51,7 @@ RUN wget -q --show-progress --progress=bar:force:noscroll https://www.doxygen.nl
   make install
 
 # Sphinx installation
-RUN python3 pip install sphinx breathe \
+RUN python3 -m pip install -U sphinx breathe \
   sphinx_rtd_theme sphinx_sitemap sphinxcontrib_mermaid sphinxcontrib_plantuml myst_parser
 
 # Zephyr SDK toolchain
