@@ -38,21 +38,7 @@ RUN apt-get install -y --no-install-recommends git ninja-build gperf \
   xz-utils file make gcc gcc-multilib g++-multilib libsdl2-dev pkg-config cmake iproute2 openocd iptables ruby ssh xvfb bzip2 dos2unix sudo unzip \
   && apt-get clean
 
-# For some reason we have to do another update here. Otherwise doxygen is not found.
-RUN apt update && apt install -y --no-install-recommends doxygen && apt clean 
-
 RUN mkdir -p /opt
-
-# Install Doxygen
-RUN wget -q --show-progress --progress=bar:force:noscroll https://www.doxygen.nl/files/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && \
-  tar xvf doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz -C /opt/ &&\
-  rm doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && \
-  cd /opt/doxygen-1.9.7 && \
-  make install
-
-# Sphinx installation
-RUN python3 -m pip install -U sphinx breathe \
-  sphinx_rtd_theme sphinx_sitemap sphinxcontrib_mermaid sphinxcontrib_plantuml myst_parser
 
 # Zephyr SDK toolchain
 RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz && \
@@ -61,6 +47,13 @@ RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zep
     rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz && \
     cd /opt/zephyr-sdk-${ZSDK_VERSION} && \
     ./setup.sh -t x86_64-zephyr-elf -t arm-zephyr-eabi -h
+
+# Install Doxygen
+RUN wget -q --show-progress --progress=bar:force:noscroll https://www.doxygen.nl/files/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && \
+  tar xvf doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz -C /opt/ &&\
+  rm doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz && \
+  cd /opt/doxygen-${DOXYGEN_VERSION} && \
+  make install
 
 # Install Python dependencies
 RUN python3 -m pip install -U pip && \
