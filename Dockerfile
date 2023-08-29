@@ -66,6 +66,7 @@ RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-dow
     && rm nrf-command-line-tools_10.15.1_amd64.deb
 
 RUN apt-get install -y minicom
+RUN apt-get install -y doxygen
 
 # #
 # # --- ENVIRONMENT ---
