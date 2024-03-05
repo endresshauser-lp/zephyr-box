@@ -23,7 +23,7 @@ RUN add-apt-repository universe
 
 RUN apt update
 
-RUN apt-get install -y sudo bash-completion vim nano man-db less inotify-tools libncurses5 libfuse2 \
+RUN apt-get install -y sudo bash-completion vim nano tmux man-db less inotify-tools libncurses5 libfuse2 \
   && apt-get clean
 
 # Avoid pwd for sudo
