@@ -19,10 +19,11 @@ RUN apt-get update \
  && apt-get install -y software-properties-common
 
 RUN add-apt-repository ppa:deadsnakes/ppa
+RUN add-apt-repository universe
 
 RUN apt update
 
-RUN apt-get install -y sudo bash-completion vim nano man-db less inotify-tools libncurses5 \
+RUN apt-get install -y sudo bash-completion vim nano man-db less inotify-tools libncurses5 libfuse2 \
   && apt-get clean
 
 # Avoid pwd for sudo
@@ -92,6 +93,13 @@ RUN mkdir -p /opt/zephyrproject/ && sudo chown -R user:user /opt/zephyrproject/
 RUN apt-get clean -y && \
 	apt-get autoremove --purge -y && \
 	rm -rf /var/lib/apt/lists/*
+
+RUN wget -q --show-progress --progress=bar https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz \
+    && wget -q --show-progress --progress=bar https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz.sha256sum \
+    && sha256sum --check nvim-linux64.tar.gz.sha256sum \
+    && rm nvim-linux64.tar.gz.sha256sum \
+    && tar xzf nvim-linux64.tar.gz -C /usr/bin \
+    && ln -s /usr/bin/nvim-linux64/bin/nvim /usr/bin/nvim
 
 # Add entrypoint script
 ADD ./entrypoint.sh /home/user/entrypoint.sh
