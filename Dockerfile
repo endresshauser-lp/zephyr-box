@@ -69,6 +69,13 @@ RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-dow
 RUN apt-get install -y minicom
 RUN apt-get install -y doxygen
 
+RUN wget -q --show-progress --progress=bar https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz \
+    && wget -q --show-progress --progress=bar https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz.sha256sum \
+    && sha256sum --check nvim-linux64.tar.gz.sha256sum \
+    && rm nvim-linux64.tar.gz.sha256sum \
+    && tar xzf nvim-linux64.tar.gz -C /usr/bin \
+    && ln -s /usr/bin/nvim-linux64/bin/nvim /usr/bin/nvim
+
 # #
 # # --- ENVIRONMENT ---
 # #
@@ -93,13 +100,6 @@ RUN mkdir -p /opt/zephyrproject/ && sudo chown -R user:user /opt/zephyrproject/
 RUN apt-get clean -y && \
 	apt-get autoremove --purge -y && \
 	rm -rf /var/lib/apt/lists/*
-
-RUN wget -q --show-progress --progress=bar https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz \
-    && wget -q --show-progress --progress=bar https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz.sha256sum \
-    && sha256sum --check nvim-linux64.tar.gz.sha256sum \
-    && rm nvim-linux64.tar.gz.sha256sum \
-    && tar xzf nvim-linux64.tar.gz -C /usr/bin \
-    && ln -s /usr/bin/nvim-linux64/bin/nvim /usr/bin/nvim
 
 # Add entrypoint script
 ADD ./entrypoint.sh /home/user/entrypoint.sh
