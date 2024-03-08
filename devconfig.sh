@@ -2,15 +2,12 @@
 
 set -e
 
-CONFIG_NAME="devconfig.sh"
-
 docker_dir="$(realpath $(dirname ${BASH_SOURCE[0]}))"
 prj_root="$(dirname $docker_dir)"
 prj_dotfiles=$prj_root/.dotfiles
 prj_deps=$prj_root/.west_workspace
 prj_deps_container=/opt/zephyrproject
 prj_root_container=$prj_deps_container/$(basename $prj_root)
-prj_config=$prj_root/$CONFIG_NAME
 container_home="/home/user"
 
 RULES=()
@@ -43,7 +40,7 @@ export_mounts() {
 # If this function terminates successfully, it returns a mount index.
 mountpoint() {
     if [[ $# -ne 3 ]]; then
-        echo "Expected three arguments (host, remote, access) but $# were given." >&2
+        echo "($FUNCNAME $@): Expected three arguments (host, remote, access) but $# were given." >&2
         # We directly return an error here so we receive it in the parent script.
         exit 1
     fi
@@ -52,7 +49,7 @@ mountpoint() {
     local hostpath=$1
     if [[ $is_volume -ne 0 ]]; then
         if ! [ -f $1 ]; then
-            echo "Host path \"$1\" not found." >&2
+            echo "($FUNCNAME $@): Host path \"$1\" not found." >&2
             exit 1
         fi
 
@@ -60,14 +57,14 @@ mountpoint() {
     fi
 
     if [[ $2 != /* ]]; then
-        echo "Remote path \"$2\" is not absolute." >&2
+        echo "($FUNCNAME $@): Remote path \"$2\" is not absolute." >&2
         exit 1
     fi
 
-    local mount_options=("ro", "wo", "rw")
-    if [[ ${mount_options[@]} =~ "\<$3\>" ]]; then
-        echo "Expected one of the following access permissions: ${mount_options[@]}" \
-            " but got \"$3\"." >&2
+    local mount_opt_regex="(ro|wo|rw|z|Z)(,(ro|wo|rw|z|Z))*"
+    if ! [[ $3 =~ $mount_opt_regex ]]; then
+        echo "($FUNCNAME $@): Expected some of the following access permissions: \"
+            ro, wo, rw, z, Z but got \"$3\"." >&2
         exit 1
     fi
 
@@ -80,7 +77,7 @@ mountpoint() {
 # Creates and mounts a Docker volume.
 volumemount() {
     if [[ $# -ne 3 ]]; then
-        echo "Expected three arguments (host, remote, access) but $# were given." >&2
+        echo "($FUNCNAME $@): Expected three arguments (host, remote, access) but $# were given." >&2
         # We directly return an error here so we receive it in the parent script.
         exit 1
     fi
@@ -88,7 +85,7 @@ volumemount() {
     if [[ $(volume_exist $1) -ne 0 ]]; then
         docker volume create $1
         if [[ $? -ne 0 ]]; then
-            echo "Failed to create volume \"$1\"." >&2
+            echo "($FUNCNAME $@): Failed to create volume \"$1\"." >&2
             exit 1
         fi
     fi
@@ -100,7 +97,7 @@ volumemount() {
 # Inserts custom bash config.
 bashconfig() {
     if [[ $# -ne 1 ]]; then
-        echo "Expected one argument (bashrc_config) but $# were given." >&2
+        echo "($FUNCNAME $@): Expected one argument (bashrc_config) but $# were given." >&2
         # We directly return an error here so we receive it in the parent script.
         exit 1
     fi
@@ -111,7 +108,7 @@ bashconfig() {
 # Inserts custom startup script.
 startconfig() {
     if [[ $# -ne 1 ]]; then
-        echo "Expected one argument (startup_config) but $# were given." >&2
+        echo "($FUNCNAME $@): Expected one argument (startup_config) but $# were given." >&2
         # We directly return an error here so we receive it in the parent script.
         exit 1
     fi
@@ -122,15 +119,15 @@ startconfig() {
 # Mounts a read only copy of a host file or folder, duplicates it on a given volume
 # and creates a link to it within the container.
 mountlink() {
-    if [[ $# -ne 4 ]]; then
-        echo "Expected three arguments (host, volume, name, remote) but $# were given." >&2
+    if [[ $# -ne 3 ]]; then
+        echo "($FUNCNAME $@): Expected three arguments (host, volume, remote) but $# were given." >&2
         # We directly return an error here so we receive it in the parent script.
         exit 1
     fi
 
     local remote_path=${volume_mounts[$2]}
     if [[ -z $remote_path ]]; then
-        echo "No mount for volume \"$2\" specified." >&2
+        echo "($FUNCNAME $@): No mount for volume \"$2\" specified." >&2
         exit 1
     fi
 
@@ -139,12 +136,13 @@ mountlink() {
         volume_mounts_has_link[$2]="y"
     fi
 
-    local link_path=$4
+    local link_path=$3
     if [[ $link_path != /* ]]; then
-        echo "The link target \"$link_path\" is not absolute." >&2
+        echo "($FUNCNAME $@): The link target \"$link_path\" is not absolute." >&2
     fi
 
-    local name=$3
+    local name=$(echo $3 | sed 's/\//-/g')
+    name=${name:1}
     local ro_path="$container_home/.dotfiles/$name"
     local rw_path="$remote_path/.links/$name"
     mountpoint $1 $ro_path "ro"
@@ -156,15 +154,15 @@ mountlink() {
 }
 
 volumelink() {
-    if [[ $# -ne 3 ]]; then
-        echo "Expected three arguments (volume, name, remote) but $# were given." >&2
+    if [[ $# -ne 2 ]]; then
+        echo "($FUNCNAME $@): Expected two arguments (volume, remote) but $# were given." >&2
         # We directly return an error here so we receive it in the parent script.
         exit 1
     fi
 
     local remote_path=${volume_mounts[$1]}
     if [[ -z $remote_path ]]; then
-        echo "No mount for volume \"$1\" specified." >&2
+        echo "($FUNCNAME $@): No mount for volume \"$1\" specified." >&2
         exit 1
     fi
 
@@ -173,10 +171,12 @@ volumelink() {
         volume_mounts_has_link[$1]="y"
     fi
 
-    local name=$2
-    local link_path=$3
+    local link_path=$2
+    local name=$(echo $link_path | sed 's/\//-/g')
+    name=${name:1}
+
     if [[ $link_path != /* ]]; then
-        echo "The link target \"$link_path\" is not absolute." >&2
+        echo "($FUNCNAME $@): The link target \"$link_path\" is not absolute." >&2
     fi
 
     local rw_path="$remote_path/.links/$name"
@@ -184,20 +184,6 @@ volumelink() {
         "mkdir -p $rw_path \
         && mkdir -p $(dirname $link_path) \
         && ln -s $rw_path $link_path" 
-}
-
-# Parses the configuration if it exists.
-parse_config() {
-    if [[ -f $prj_config ]]; then
-        cd $(realpath $(dirname $prj_config))
-        . $prj_config
-        err=$?
-        cd - >/dev/null
-        if [ $err -ne 0 ]; then
-            echo "Configuration in $prj_config contained errors ($err). Aborting..." >&2
-            exit $err
-        fi
-    fi
 }
 
 # Updates the Docker container and runs an interactive shell inside it.
@@ -226,7 +212,4 @@ build_and_run() {
         zephyr-box                                          \
         $(export_rules)
 }
-
-parse_config
-build_and_run
 
