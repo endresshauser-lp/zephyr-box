@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 docker_dir="$(realpath $(dirname ${BASH_SOURCE[0]}))"
 prj_root="$(dirname $docker_dir)"
 prj_deps=$prj_root/.west_workspace
@@ -13,11 +11,22 @@ startup_prefix="/tmp"
 startup_location="$startup_prefix/"
 
 IMAGE_NAME=""
+CONTAINER_NAME="zephyr-kite"
 START_CMD="bash"
 RULES=()
 MOUNTS=()
 declare -A volume_mounts
 declare -A volume_mounts_has_link
+
+# Set the name for the container.
+set_name() {
+    if [[ $# -ne 1 ]]; then
+        echo "($FUNCNAME $@): Expected one argument (container-name) but $# were given." >&2
+        exit 1
+    fi
+
+    CONTAINER_NAME=$1
+}
 
 # Check if a volume exists.
 volume_exist() {
@@ -234,7 +243,7 @@ build_and_run() {
     cd - >/dev/null
 
     # Run the docker image.
-    docker run --rm --network host --privileged -ti         \
+    docker run --rm --network host --privileged -tid        \
         -e RUN_IN_TERM=1                                    \
         -e WEST_WORKSPACE_CONTAINER=$prj_deps_container     \
         -e WORKDIR_CONTAINER=$prj_root_container            \
@@ -245,9 +254,19 @@ build_and_run() {
         $(export_mounts)                                    \
                                                             \
         -w $prj_root_container                              \
+        --name $CONTAINER_NAME                              \
         $IMAGE_NAME                                         \
         $START_CMD
 
     rm $startup_location
+}
+
+# Attaches to a running container or builds it if it doesn't exist.
+attach() {
+    docker ps --filter="name=$CONTAINER_NAME" | grep $CONTAINER_NAME >/dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        build_and_run
+    fi
+    docker exec -it $CONTAINER_NAME /bin/bash
 }
 
