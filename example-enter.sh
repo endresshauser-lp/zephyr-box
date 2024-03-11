@@ -1,12 +1,18 @@
-# This bash file contains a sample configuration for developing in the container.
+# This bash file contains the configuration for developing in the container.
 
 # First, we load the coonfiguration utilities.
 source zephyr-box/devconfig.sh
 
+# Specify the image to use.
+use_image "zephyr-box"
+
 # Next, we specify some ordinary mounts and add our custom bashrc extensions.
-bashconfig ".dotfiles/bashrc_custom" # You can even specify relative mountpoints
+bashconfig ".dotfiles/bashrc_custom"
 mountpoint "~/.ssh" "/home/user/.ssh" "ro"
 mountpoint "~/.tmux.conf" "/home/user/.tmux.conf" "ro"
+
+# Project mappings
+
 
 # Here, we create and mount a volume in which we include configs and files that
 # need to be modifiable.

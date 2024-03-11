@@ -20,3 +20,4 @@ else
     cd $WORKDIR_CONTAINER
     bash
 fi
+
