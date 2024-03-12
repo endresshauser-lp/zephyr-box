@@ -1,5 +1,14 @@
 #!/bin/bash
 
+USE_WORKTREES=0
+IMAGE_NAME=""
+CONTAINER_NAME="zephyr-kite"
+START_CMD="bash"
+RULES=()
+MOUNTS=()
+declare -A volume_mounts
+declare -A volume_mounts_has_link
+
 docker_dir="$(realpath $(dirname ${BASH_SOURCE[0]}))"
 prj_root="$(dirname $docker_dir)"
 prj_deps=$prj_root/.west_workspace
@@ -10,14 +19,6 @@ container_home="/home/$user"
 startup_prefix="/tmp"
 startup_location="$startup_prefix/"
 
-IMAGE_NAME=""
-CONTAINER_NAME="zephyr-kite"
-START_CMD="bash"
-RULES=()
-MOUNTS=()
-declare -A volume_mounts
-declare -A volume_mounts_has_link
-
 # Set the name for the container.
 set_name() {
     if [[ $# -ne 1 ]]; then
@@ -26,6 +27,15 @@ set_name() {
     fi
 
     CONTAINER_NAME=$1
+}
+
+use_worktrees() {
+    if [[ $# -ne 0 ]]; then
+        echo "($FUNCNAME $@): Expected no arguments but $# were given." >&2
+        exit 1
+    fi
+
+    USE_WORKTREES=1
 }
 
 # Check if a volume exists.
@@ -242,20 +252,28 @@ build_and_run() {
     docker build --network host --tag zephyr-box $docker_dir
     cd - >/dev/null
 
+    current_branch=''
+    if [[ $USE_WORKTREES != 0 ]]; then
+        current_branch="/$(basename $prj_root)"
+        prj_root=$(dirname $prj_root)
+        prj_root_container=$prj_deps_container/$(basename $prj_root)
+    fi
+
     # Run the docker image.
-    docker run --rm --network host --privileged -tid        \
-        -e RUN_IN_TERM=1                                    \
-        -e WEST_WORKSPACE_CONTAINER=$prj_deps_container     \
-        -e WORKDIR_CONTAINER=$prj_root_container            \
-                                                            \
-        -v /dev:/dev                                        \
-        -v $prj_deps:$prj_deps_container                    \
-        -v $prj_root:$prj_root_container                    \
-        $(export_mounts)                                    \
-                                                            \
-        -w $prj_root_container                              \
-        --name $CONTAINER_NAME                              \
-        $IMAGE_NAME                                         \
+    docker run --rm --network host --privileged -tid                \
+        -e RUN_IN_TERM=1                                            \
+        -e USE_WORKTREES=$USE_WORKTREES                             \
+        -e WEST_WORKSPACE_CONTAINER=$prj_deps_container             \
+        -e WORKDIR_CONTAINER=$prj_root_container$current_branch     \
+                                                                    \
+        -v /dev:/dev                                                \
+        -v $prj_deps:$prj_deps_container                            \
+        -v $prj_root:$prj_root_container                            \
+        $(export_mounts)                                            \
+                                                                    \
+        -w $prj_root_container                                      \
+        --name $CONTAINER_NAME                                      \
+        $IMAGE_NAME                                                 \
         $START_CMD
 
     rm $startup_location
