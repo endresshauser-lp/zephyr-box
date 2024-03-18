@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-ARG ZSDK_VERSION=0.15.0
+ARG ZSDK_VERSION=0.16.4
 ARG PYTHON_VERSION=3.10
 
 ARG UID=1001
@@ -40,12 +40,11 @@ RUN apt-get install -y --no-install-recommends git ninja-build gperf \
 
 RUN mkdir -p /opt
 
-
 # Zephyr SDK toolchain
-RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz && \
+RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz && \
     wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/sha256.sum | shasum --check --ignore-missing && \
-    tar xvf zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz -C /opt/ && \
-    rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64.tar.gz && \
+    tar xvf zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz -C /opt/ && \
+    rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz && \
     cd /opt/zephyr-sdk-${ZSDK_VERSION} && \
     ./setup.sh -t x86_64-zephyr-elf -t arm-zephyr-eabi -h
 
