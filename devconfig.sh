@@ -183,11 +183,12 @@ mountlink() {
     local rw_path="$remote_path/.links/$name"
     mountpoint $1 $ro_path "ro"
     add_rule \
-        "sudo rm -rf $rw_path \
-        && sudo cp -r $ro_path $rw_path \
-        && sudo mkdir -p $(dirname $link_path) \
-        && sudo ln -s $rw_path $link_path" \
-        && sudo chown $user $link_path
+        "rm -rf $rw_path \
+        && cp -r $ro_path $rw_path \
+        && mkdir -p $(dirname $link_path) \
+        && ln -s $rw_path $link_path \
+        && chown $user $link_path \
+        && chown $user $rw_path"
 }
 
 # Creates a link from a read-only part in the filesystem to a writable path on a given volume.
