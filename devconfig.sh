@@ -186,7 +186,8 @@ mountlink() {
         "sudo rm -rf $rw_path \
         && sudo cp -r $ro_path $rw_path \
         && sudo mkdir -p $(dirname $link_path) \
-        && sudo ln -s $rw_path $link_path" 
+        && sudo ln -s $rw_path $link_path" \
+        && sudo chown $user $link_path
 }
 
 # Creates a link from a read-only part in the filesystem to a writable path on a given volume.
