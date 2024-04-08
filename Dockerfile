@@ -56,6 +56,12 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm ./google-chrome-stable_current_amd64.deb
 
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.105/linux64/chromedriver-linux64.zip
+RUN unzip chromedriver-linux64.zip && \
+    cp ./chromedriver-linux64/chromedriver /usr/bin/ && \
+    rm -r ./chromedriver-linux64 && \
+    rm chromedriver-linux64.zip
+
 # gnuarmemb toolchain (for puncover)
 RUN    wget -O archive.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz?rev=71e595a1f2b6457bab9242bc4a40db90&hash=37B0C59767BAE297AEB8967E7C54705BAE9A4B95" && \
     echo 1f2277f96903551ac7b2766f17513542 archive.tar.xz > /tmp/archive.md5 && md5sum -c /tmp/archive.md5 && rm /tmp/archive.md5 && \
