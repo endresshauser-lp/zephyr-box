@@ -34,7 +34,8 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo-nopasswd
 RUN apt-get install -y --no-install-recommends git ninja-build gperf \
   ccache dfu-util device-tree-compiler wget clang-format \
   python3-pip python3-setuptools python3-wheel python3-venv python${PYTHON_VERSION}-tk python${PYTHON_VERSION}-dev \
-  xz-utils file make gcc gcc-multilib g++-multilib libsdl2-dev pkg-config cmake iproute2 openocd iptables ruby ssh xvfb bzip2 dos2unix sudo unzip\
+  xz-utils file make gcc gcc-multilib g++-multilib libsdl2-dev pkg-config cmake iproute2 openocd iptables ruby ssh \
+  xvfb bzip2 dos2unix sudo unzip clang-tidy cppcheck clang\
   && apt-get clean
 
 
