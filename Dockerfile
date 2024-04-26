@@ -1,7 +1,7 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ARG ZSDK_VERSION=0.16.4
-ARG PYTHON_VERSION=3.10
+ARG PYTHON_VERSION=3.12
 
 ARG UID=1001
 ARG GID=1001
@@ -18,11 +18,12 @@ RUN apt-get update \
  && apt-get clean \
  && apt-get install -y software-properties-common
 
-RUN add-apt-repository ppa:deadsnakes/ppa
+#Add in case newer python versions are needed.
+#RUN add-apt-repository ppa:deadsnakes/ppa
 
 RUN apt update
 
-RUN apt-get install -y sudo bash-completion vim nano man-db less inotify-tools libncurses5 \
+RUN apt-get install -y sudo bash-completion vim nano man-db less inotify-tools libncurses6 \
   && apt-get clean
 
 # Avoid pwd for sudo
@@ -76,10 +77,6 @@ RUN    wget -O archive.tar.xz "https://developer.arm.com/-/media/Files/downloads
     ln -s /opt/toolchains/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy && \
     ln -s /opt/toolchains/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump /usr/bin/arm-none-eabi-objdump
 
-# Install Python dependencies
-RUN python3 -m pip install -U pip && \
-  pip3 install west cryptography
-
 #
 # --- NRF command line tools ---
 #
@@ -105,6 +102,11 @@ RUN apt-get install -y minicom
 #ENV ZEPHYR_BASE=$WEST_WORKSPACE_CONTAINER/zephyr
 ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
 ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
+
+#
+# Remove 'ubuntu' account
+#
+RUN userdel -r ubuntu
 
 #
 # Create 'user' account
