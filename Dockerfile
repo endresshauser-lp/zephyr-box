@@ -93,6 +93,11 @@ RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-dow
 
 RUN apt-get install -y minicom
 
+#
+# --- Sdcard image tools ---
+#
+RUN apt-get install -y libparted-dev dosfstools lz4
+
 # #
 # # --- ENVIRONMENT ---
 # #
