@@ -58,7 +58,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm ./google-chrome-stable_current_amd64.deb
 
-RUN wget https://storage.googleapis.com/chrome-for-testing-public/123.0.6312.105/linux64/chromedriver-linux64.zip
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.78/linux64/chromedriver-linux64.zip
 RUN unzip chromedriver-linux64.zip && \
     cp ./chromedriver-linux64/chromedriver /usr/bin/ && \
     rm -r ./chromedriver-linux64 && \
