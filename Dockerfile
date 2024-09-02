@@ -52,9 +52,10 @@ RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zep
 RUN python3 -m pip install -U pip && \
   pip3 install west cryptography
 
-#
-# --- NRF command line tools ---
-#
+# Install JLink tools
+RUN wget https://www.segger.com/downloads/jlink/Ozone_Linux_x86_64.deb && dpkg -i --force-overwrite Ozone_Linux_x86_64.deb && rm Ozone_Linux_x86_64.deb
+
+# NRF command line tools (contains JLink software).
 RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-15-1/nrf-command-line-tools-10.15.1_linux-amd64.zip \
     && unzip nrf-command-line-tools-10.15.1_linux-amd64.zip \
     && dpkg -i --force-overwrite nrf-command-line-tools_10.15.1_amd64.deb \

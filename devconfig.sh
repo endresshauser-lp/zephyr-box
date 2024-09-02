@@ -263,6 +263,7 @@ build_and_run() {
 
     # Run the docker image.
     docker run --rm --network host --privileged -tid                \
+        -e DISPLAY=$DISPLAY                                         \
         -e RUN_IN_TERM=1                                            \
         -e USE_WORKTREES=$USE_WORKTREES                             \
         -e WEST_WORKSPACE_CONTAINER=$prj_deps_container             \
