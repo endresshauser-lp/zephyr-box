@@ -1,0 +1,14 @@
+manifest:
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+  projects:
+    - name: zephyr
+      path: zephyr
+      remote: zephyrproject-rtos
+      # make an explicit revision (revision:main, Semptember 2024) so that file
+      # changes, on change of revision causing the docker layer to be rebuild
+      revision: 119b238594971a41dc55609d7509677efc675a6c
+      # explicitly add Zephyr-specific West extensions
+      west-commands: scripts/west-commands.yml
+      import: false
