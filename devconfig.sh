@@ -251,7 +251,7 @@ build_and_run() {
     # Build the docker image.
     echo "Updating Docker image..."
     cd $docker_dir
-    docker build --network host --tag zephyr-box $docker_dir
+    docker build --network host --tag $IMAGE_NAME $docker_dir
     cd - >/dev/null
 
     current_branch=''
