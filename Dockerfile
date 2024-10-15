@@ -105,16 +105,19 @@ ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 #
 # --- Chrome (for Selenium Tests) ---
 #
-RUN wget -q --show-progress --progress=bar:force:noscroll https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN export DEBIAN_FRONTEND=noninteractive && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm ./google-chrome-stable_current_amd64.deb
-
-RUN wget https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.78/linux64/chromedriver-linux64.zip
-RUN unzip chromedriver-linux64.zip && \
-    cp ./chromedriver-linux64/chromedriver /usr/bin/ && \
-    rm -r ./chromedriver-linux64 && \
-    rm chromedriver-linux64.zip
+RUN apt-get update \
+    && wget --quiet --show-progress --progress=dot:giga \
+        https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends \
+        ./google-chrome-stable_current_amd64.deb \
+    && rm ./google-chrome-stable_current_amd64.deb \
+    && wget --quiet --show-progress --progress=dot:giga \
+        https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.78/linux64/chromedriver-linux64.zip \
+    && unzip chromedriver-linux64.zip \
+    && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
+    && rm --recursive ./chromedriver-linux64 \
+    && rm chromedriver-linux64.zip \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 #
 # --- Puncover ---
