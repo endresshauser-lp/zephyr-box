@@ -24,15 +24,15 @@ docker build \
     --tag zephyr-box \
     .
 
-docker run --network host -ti --rm --privileged \
-    -v $WEST_WORKSPACE_HOST:$WEST_WORKSPACE_CONTAINER \
-    -v $WORKDIR_HOST:$WORKDIR_CONTAINER \
-    -v ~/.ssh:/home/user/.ssh \
-    -v ~/.bash_aliases:/home/user/.bash_aliases \
-    -w $WORKDIR_CONTAINER \
-    -e WEST_WORKSPACE_CONTAINER=$WEST_WORKSPACE_CONTAINER \
-    -e WORKDIR_CONTAINER=$WORKDIR_CONTAINER \
-    -e PYTHON_VENV_CONTAINER=$PYTHON_VENV_CONTAINER \
-    -v /dev:/dev \
+docker run \
+    --network host --tty --interactive --rm --privileged \
+    --volume $WEST_WORKSPACE_HOST:$WEST_WORKSPACE_CONTAINER \
+    --volume $WORKDIR_HOST:$WORKDIR_CONTAINER \
+    --volume ~/.ssh:/home/user/.ssh \
+    --volume ~/.bash_aliases:/home/user/.bash_aliases \
+    --volume /dev:/dev \
+    --env WEST_WORKSPACE_CONTAINER=$WEST_WORKSPACE_CONTAINER \
+    --env WORKDIR_CONTAINER=$WORKDIR_CONTAINER \
+    --env PYTHON_VENV_CONTAINER=$PYTHON_VENV_CONTAINER \
     zephyr-box \
     "$@"
