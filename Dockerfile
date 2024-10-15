@@ -7,51 +7,108 @@ ARG UID=1001
 ARG GID=1001
 
 #
-# --- General ---
+# --- Time zone ---
 #
-
 ENV TZ=Europe/Zurich
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN ln --symbolic --no-dereference --force /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
 
+#
+# --- General APT packages ---
+#
 RUN apt-get update \
- && apt-get upgrade -y \
- && apt-get clean \
- && apt-get install -y software-properties-common
-
-#Add in case newer python versions are needed.
-#RUN add-apt-repository ppa:deadsnakes/ppa
-
-RUN apt update
-
-RUN apt-get install -y sudo bash-completion vim nano man-db less inotify-tools libncurses6 \
-  && apt-get clean
+    && apt-get upgrade --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends \
+        software-properties-common \
+        sudo \
+        bash-completion \
+        vim \
+        nano \
+        man-db \
+        less \
+        inotify-tools \
+        libncurses6 \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 # Avoid pwd for sudo
 RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo-nopasswd
 
 #
-# --- Zephyr ---
+# --- Other General APT Packages ---
 #
-RUN apt-get install -y --no-install-recommends git ninja-build gperf \
-  ccache dfu-util device-tree-compiler wget clang-format \
-  python3-pip python3-setuptools python3-wheel python3-venv python${PYTHON_VERSION}-tk python${PYTHON_VERSION}-dev \
-  xz-utils file make gcc gcc-multilib g++-multilib libsdl2-dev pkg-config cmake iproute2 openocd iptables ruby ssh \
-  xvfb bzip2 dos2unix sudo unzip clang-tidy cppcheck clang\
-  && apt-get clean
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends \
+        clang-format \
+        pkg-config \
+        iproute2 \
+        openocd \
+        iptables \
+        ruby \
+        ssh \
+        xvfb \
+        bzip2 \
+        dos2unix \
+        unzip \
+        clang-tidy \
+        cppcheck \
+        clang \
+        minicom \
+    && rm --recursive --force /var/lib/apt/lists/*
+ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
 
+#
+# --- Minicom configuration ---
+#
+RUN echo "pu port /dev/ttyACM0" >> /etc/minicom/minirc.ttyACM0
 
+#
+# --- Zephyr APT packages ---
+# Required according to:
+# https://docs.zephyrproject.org/latest/develop/getting_started/index.html#install-dependencies
+#
+RUN apt-get update \
+    && apt-get upgrade --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends \
+        git \
+        cmake \
+        ninja-build \
+        gperf \
+        ccache \
+        dfu-util \
+        device-tree-compiler \
+        wget \
+        python3-venv \
+        python3-dev \
+        #python${PYTHON_VERSION}-dev ?
+        python3-pip \
+        python3-setuptools \
+        python3-tk \
+        #python${PYTHON_VERSION}-tk ?
+        python3-wheel \
+        xz-utils \
+        file \
+        make \
+        gcc \
+        gcc-multilib \
+        g++-multilib \
+        libsdl2-dev \
+        libmagic1 \
+    && rm --recursive --force /var/lib/apt/lists/*
+
+#
+# --- Zephyr SDK toolchain ---
+#
 RUN mkdir -p /opt
-
-# Zephyr SDK toolchain
 RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz && \
     wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/sha256.sum | shasum --check --ignore-missing && \
     tar xvf zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz -C /opt/ && \
     rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz && \
     cd /opt/zephyr-sdk-${ZSDK_VERSION} && \
     ./setup.sh -t x86_64-zephyr-elf -t arm-zephyr-eabi -h
+ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 
 #
-# --- Chrome (for Selenium Tests)
+# --- Chrome (for Selenium Tests) ---
 #
 RUN wget -q --show-progress --progress=bar:force:noscroll https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 RUN export DEBIAN_FRONTEND=noninteractive && \
@@ -64,7 +121,9 @@ RUN unzip chromedriver-linux64.zip && \
     rm -r ./chromedriver-linux64 && \
     rm chromedriver-linux64.zip
 
-# gnuarmemb toolchain (for puncover)
+#
+# --- Puncover ---
+#
 RUN pip3 install --verbose --upgrade --no-cache-dir --break-system-packages \
         'puncover@git+https://github.com/HBehrens/puncover@0.4.2' \
     && wget -O archive.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz?rev=71e595a1f2b6457bab9242bc4a40db90&hash=37B0C59767BAE297AEB8967E7C54705BAE9A4B95" && \
@@ -93,49 +152,33 @@ RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-dow
     && rm nrf-command-line-tools-10.15.1-1.amd64.rpm \
     && rm nrf-command-line-tools_10.15.1_amd64.deb
 
-RUN apt-get install -y minicom
+#
+# --- APT packages for SD-card image ---
+#
+RUN apt-get update \
+    && apt-get upgrade --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends \
+        libparted-dev \
+        dosfstools \
+        lz4 \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 #
-# --- Sdcard image tools ---
-#
-RUN apt-get install -y libparted-dev dosfstools lz4
-
-# #
-# # --- ENVIRONMENT ---
-# #
-
-#Dont set ZEPHYR_BASE as it is dependent on the west_workspace
-#ENV WEST_WORKSPACE_CONTAINER=/opt/zephyrproject
-#ENV ZEPHYR_BASE=$WEST_WORKSPACE_CONTAINER/zephyr
-ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
-ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
-
-#
-# Remove 'ubuntu' account
+# --- Remove 'ubuntu' user and create USER_NAME user ---
 #
 RUN userdel -r ubuntu
-
-#
-# Create user account
-#
 RUN groupadd -g $GID -o user
-
 RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g user -G plugdev -G dialout user \
     && echo "user ALL = NOPASSWD: ALL" > /etc/sudoers.d/user \
     && chmod 0440 /etc/sudoers.d/user
 
-# Clean up stale packages
-RUN apt-get clean -y && \
-    apt-get autoremove --purge -y && \
-    rm -rf /var/lib/apt/lists/*
+RUN chsh --shell /bin/bash user
 
 # Add entrypoint script
 RUN --mount=type=bind,source=./entrypoint.sh,target=/tmp/entrypoint.sh \
     cp /tmp/entrypoint.sh /home/user/entrypoint.sh \
     && dos2unix /home/user/entrypoint.sh \
     && chmod +x /home/user/entrypoint.sh
-
-RUN chsh --shell /bin/bash user
 
 USER user
 
