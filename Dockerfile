@@ -28,16 +28,6 @@ RUN apt-get update \
         less \
         inotify-tools \
         libncurses6 \
-    && rm --recursive --force /var/lib/apt/lists/*
-
-# Avoid pwd for sudo
-RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo-nopasswd
-
-#
-# --- Other General APT Packages ---
-#
-RUN apt-get update \
-    && apt-get install --assume-yes --no-install-recommends \
         clang-format \
         pkg-config \
         iproute2 \
@@ -54,12 +44,15 @@ RUN apt-get update \
         clang \
         minicom \
     && rm --recursive --force /var/lib/apt/lists/*
-ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
 
 #
-# --- Minicom configuration ---
+# --- Configuration ---
 #
+ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
+# Minicom configuration
 RUN echo "pu port /dev/ttyACM0" >> /etc/minicom/minirc.ttyACM0
+# Avoid pwd for sudo
+RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo-nopasswd
 
 #
 # --- Zephyr APT packages ---
