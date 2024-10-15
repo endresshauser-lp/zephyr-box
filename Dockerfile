@@ -3,7 +3,6 @@ FROM ubuntu:24.04
 ARG ZSDK_VERSION=0.16.4
 ARG PYTHON_VERSION=3.12
 
-ARG USER_NAME=user
 ARG UID=1001
 ARG GID=1001
 
@@ -66,7 +65,9 @@ RUN unzip chromedriver-linux64.zip && \
     rm chromedriver-linux64.zip
 
 # gnuarmemb toolchain (for puncover)
-RUN    wget -O archive.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz?rev=71e595a1f2b6457bab9242bc4a40db90&hash=37B0C59767BAE297AEB8967E7C54705BAE9A4B95" && \
+RUN pip3 install --verbose --upgrade --no-cache-dir --break-system-packages \
+        'puncover@git+https://github.com/HBehrens/puncover@0.4.2' \
+    && wget -O archive.tar.xz "https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz?rev=71e595a1f2b6457bab9242bc4a40db90&hash=37B0C59767BAE297AEB8967E7C54705BAE9A4B95" && \
     echo 1f2277f96903551ac7b2766f17513542 archive.tar.xz > /tmp/archive.md5 && md5sum -c /tmp/archive.md5 && rm /tmp/archive.md5 && \
     mkdir -p /opt/toolchains && \
     tar xf archive.tar.xz -C /opt/toolchains && \
@@ -115,13 +116,13 @@ ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 RUN userdel -r ubuntu
 
 #
-# Create 'USER_NAME' account
+# Create user account
 #
-RUN groupadd -g $GID -o $USER_NAME
+RUN groupadd -g $GID -o user
 
-RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g $USER_NAME -G plugdev -G dialout $USER_NAME \
-    && echo "$USER_NAME ALL = NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
-    && chmod 0440 /etc/sudoers.d/$USER_NAME
+RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g user -G plugdev -G dialout user \
+    && echo "user ALL = NOPASSWD: ALL" > /etc/sudoers.d/user \
+    && chmod 0440 /etc/sudoers.d/user
 
 # Clean up stale packages
 RUN apt-get clean -y && \
@@ -129,8 +130,10 @@ RUN apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Add entrypoint script
-ADD ./entrypoint.sh /home/user/entrypoint.sh
-RUN dos2unix /home/user/entrypoint.sh && chmod +x /home/user/entrypoint.sh
+RUN --mount=type=bind,source=./entrypoint.sh,target=/tmp/entrypoint.sh \
+    cp /tmp/entrypoint.sh /home/user/entrypoint.sh \
+    && dos2unix /home/user/entrypoint.sh \
+    && chmod +x /home/user/entrypoint.sh
 
 RUN chsh --shell /bin/bash user
 
