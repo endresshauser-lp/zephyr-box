@@ -88,13 +88,18 @@ RUN apt-get update \
 #
 # --- Zephyr SDK toolchain ---
 #
-RUN mkdir -p /opt
-RUN wget -q --show-progress --progress=bar:force:noscroll https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz && \
-    wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/sha256.sum | shasum --check --ignore-missing && \
-    tar xvf zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz -C /opt/ && \
-    rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz && \
-    cd /opt/zephyr-sdk-${ZSDK_VERSION} && \
-    ./setup.sh -t x86_64-zephyr-elf -t arm-zephyr-eabi -h
+WORKDIR /opt
+RUN wget --quiet --show-progress --progress=dot:giga \
+        https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz \
+    && wget --quiet --show-progress --progress=dot:giga --output-document - \
+        https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/sha256.sum \
+        | shasum --check --ignore-missing \
+    && tar --extract --file zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz \
+    && rm zephyr-sdk-${ZSDK_VERSION}_linux-x86_64_minimal.tar.xz \
+    && cd zephyr-sdk-${ZSDK_VERSION} \
+    # -t toolchain
+    # -h host tools
+    && ./setup.sh -h -t x86_64-zephyr-elf -t arm-zephyr-eabi
 ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 
 #
