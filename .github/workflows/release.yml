@@ -2,9 +2,9 @@ name: Release Docker
 
 on:
   workflow_dispatch:
-  
+
 env:
-  DOCKER_IMAGE_SLIM: endresshauser/zephyr-box:1.0.1"
+  DOCKER_IMAGE_SLIM: endresshauser/zephyr-box:2.0.1"
 
 jobs:
   build:
