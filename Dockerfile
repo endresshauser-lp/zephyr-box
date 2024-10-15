@@ -20,21 +20,11 @@ RUN apt-get update \
     && apt-get install --assume-yes --no-install-recommends \
         software-properties-common \
         sudo \
-        bash-completion \
-        vim \
-        nano \
-        man-db \
-        less \
-        inotify-tools \
-        libncurses6 \
-        clang-format \
         pkg-config \
         iproute2 \
         openocd \
         iptables \
-        ruby \
         ssh \
-        xvfb \
         bzip2 \
         dos2unix \
         unzip \
