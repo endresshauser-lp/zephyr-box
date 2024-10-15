@@ -1,6 +1,7 @@
 # Zephyr-box
 
-This project strives to make containerized development with Nordic chips,  Zephyr-RTOS and VS Code as smooth as possible.
+This project strives to make containerized development with Nordic/ST chips, Zephyr-RTOS and VS Code as smooth as possible.
+It also provides an environment for running CI-jobs.
 
 ## Usage
 
@@ -16,10 +17,11 @@ This project strives to make containerized development with Nordic chips,  Zephy
    It's needed for some extensions and to select newly installed python venv for tasks.
 7. Enjoy! Or not.
 
-P.S. You can also run bash in Docker by `run_in_docker.sh bash` script.
+If you want to run a specific command, you may also do `run_in_docker.sh <SPECIFIC COMMAND>`.
+You can build or flash from the calling context with `run_in_docker.sh west build` and `run_in_docker.sh west flash -r pyocd`.
+You can also run bash in Docker by `run_in_docker.sh bash`.
 Then you can also attach to running container with VSCode, but you won't have docker extensions and some other configurations.
-
-P.P.S Please note that if only `on_docker_startup.sh` is changed, there is no need to rebuild the image!
+Please note that if only `on_docker_startup.sh` is changed, there is no need to rebuild the image!
 
 ---
 
@@ -31,7 +33,7 @@ P.P.S Please note that if only `on_docker_startup.sh` is changed, there is no ne
 - Restaring udev: `sudo service udev restart && sudo udevadm control --reload`
 
 2. Minicom has to be setup to use Logs. It's not done since Serial ports can be individual. Check them with `dmesg | grep tty`, `lsusb`. Usually it's something like `/dev/ttyACM0`.
-Use `sudo minicom -s` to set it up, then set as default
+Use `sudo minicom -s` to set it up, `/dev/ttyACM0` is set as default.
 
 2. If building container does not work:
    - try adding `--no-cache` to `docker build` command.
@@ -41,5 +43,5 @@ Use `sudo minicom -s` to set it up, then set as default
 4. If image is build succesfully in `run_in_docker.sh`, but you have issues with VSCode,
    try running `Dev Containers: Rebuild without cache and reopen in contaier` action (not from a container).
    Also ensure that there are no modification which cause container to exit before VSCode canattach itself.
-5. If you have issues with `nrfjprog`/`west flash`, ensure `$LANG` is not set.
+5. If you have issues with `west flash`, ensure `$LANG` is not set.
    "terminal.integrated.detectLocale": "off" has to be off, otherwise VSCode sets this ENV.
