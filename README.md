@@ -16,7 +16,7 @@ This project strives to make containerized development with Nordic chips,  Zephy
    It's needed for some extensions and to select newly installed python venv for tasks.
 7. Enjoy! Or not.
 
-P.S. You can also run bash in Docker by `run_bash_in_docker.sh` script.
+P.S. You can also run bash in Docker by `run_in_docker.sh bash` script.
 Then you can also attach to running container with VSCode, but you won't have docker extensions and some other configurations.
 
 P.P.S Please note that if only `on_docker_startup.sh` is changed, there is no need to rebuild the image!
@@ -38,7 +38,7 @@ Use `sudo minicom -s` to set it up, then set as default
    - try running the first time from the shell script instead of VSCode to see the logs clearly without pop-up errors.
 3. If you reloaded VSCode before intitial installation was complete, no problem.
    Close VSCode, run `docker ps`, stop running containers and open VSCode again.
-4. If image is build succesfully in `run_bash_in_docker.sh`, but you have issues with VSCode,
+4. If image is build succesfully in `run_in_docker.sh`, but you have issues with VSCode,
    try running `Dev Containers: Rebuild without cache and reopen in contaier` action (not from a container).
    Also ensure that there are no modification which cause container to exit before VSCode canattach itself.
 5. If you have issues with `nrfjprog`/`west flash`, ensure `$LANG` is not set.

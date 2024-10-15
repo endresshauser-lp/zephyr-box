@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-echo `basename "$0"`
 
 printf "\u1b[32m
 ███████╗███████╗██████╗ ██╗  ██╗██╗   ██╗██████╗       ██████╗  ██████╗ ██╗  ██╗
@@ -10,7 +9,6 @@ printf "\u1b[32m
 ███████╗███████╗██║     ██║  ██║   ██║   ██║  ██║      ██████╔╝╚██████╔╝██╔╝ ██╗
 ╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝      ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
 \033[m\n"
-
 
 if [ -d "$PYTHON_VENV_CONTAINER" ];
 then
@@ -26,11 +24,6 @@ pip install west cryptography
 dos2unix $WORKDIR_CONTAINER/on_docker_startup.sh
 env ZEPHRY_BOX_PYTHON_VENV=$PYTHON_VENV_CONTAINER /bin/bash $WORKDIR_CONTAINER/on_docker_startup.sh
 
-if [ -z "$RUN_IN_TERM" ];
-then
-    echo 'Container is running.'
-else
-    echo 'Container is running and can be attached.'
-    cd $WORKDIR_CONTAINER
-    bash
-fi
+echo 'Container is running.'
+cd $WORKDIR_CONTAINER
+"$@"

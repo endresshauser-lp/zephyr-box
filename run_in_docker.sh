@@ -33,7 +33,7 @@ docker run --network host -ti --rm --privileged \
 	-e WEST_WORKSPACE_CONTAINER=$WEST_WORKSPACE_CONTAINER \
 	-e WORKDIR_CONTAINER=$WORKDIR_CONTAINER \
 	-e PYTHON_VENV_CONTAINER=$PYTHON_VENV_CONTAINER \
-	-e RUN_IN_TERM=true \
 	-p 80:80 \
 	-v /dev:/dev \
-	zephyr-box
+	zephyr-box \
+	"$@"
