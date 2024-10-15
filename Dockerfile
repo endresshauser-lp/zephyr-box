@@ -120,13 +120,13 @@ RUN userdel -r ubuntu
 RUN groupadd -g $GID -o $USER_NAME
 
 RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g $USER_NAME -G plugdev -G dialout $USER_NAME \
-	&& echo "$USER_NAME ALL = NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
-	&& chmod 0440 /etc/sudoers.d/$USER_NAME
+    && echo "$USER_NAME ALL = NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
+    && chmod 0440 /etc/sudoers.d/$USER_NAME
 
 # Clean up stale packages
 RUN apt-get clean -y && \
-	apt-get autoremove --purge -y && \
-	rm -rf /var/lib/apt/lists/*
+    apt-get autoremove --purge -y && \
+    rm -rf /var/lib/apt/lists/*
 
 # Add entrypoint script
 ADD ./entrypoint.sh /home/user/entrypoint.sh
