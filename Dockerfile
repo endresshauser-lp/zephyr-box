@@ -178,4 +178,14 @@ RUN --mount=type=bind,source=./entrypoint.sh,target=/tmp/entrypoint.sh \
 #
 USER user
 
+#
+# --- pyOCD packs for flashing/debugging ---
+#
+RUN pip3 install --upgrade --no-cache-dir --break-system-packages pyocd \
+    && /home/user/.local/bin/pyocd pack install stm32h5 nrf52840 nrf91 \
+    # Remove system package again. It will be installed into venv on demand.
+    && pip3 uninstall --yes --break-system-packages pyocd \
+    # Remove cache for smaller image size
+    && rm /home/user/.local/share/cmsis-pack-manager/*pdsc
+
 ENTRYPOINT ["/home/user/entrypoint.sh"]
