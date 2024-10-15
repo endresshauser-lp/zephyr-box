@@ -3,6 +3,7 @@ FROM ubuntu:24.04
 ARG ZSDK_VERSION=0.16.4
 ARG PYTHON_VERSION=3.12
 
+ARG USER_NAME=user
 ARG UID=1001
 ARG GID=1001
 
@@ -114,17 +115,13 @@ ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 RUN userdel -r ubuntu
 
 #
-# Create 'user' account
+# Create 'USER_NAME' account
 #
-RUN groupadd -g $GID -o user
+RUN groupadd -g $GID -o $USER_NAME
 
-RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g user -G plugdev user \
-	&& echo 'user ALL = NOPASSWD: ALL' > /etc/sudoers.d/user \
-	&& chmod 0440 /etc/sudoers.d/user
-
-RUN usermod -a -G dialout user
-
-RUN mkdir -p /opt/zephyrproject/ && sudo chown -R user:user /opt/zephyrproject/
+RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g $USER_NAME -G plugdev -G dialout $USER_NAME \
+	&& echo "$USER_NAME ALL = NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
+	&& chmod 0440 /etc/sudoers.d/$USER_NAME
 
 # Clean up stale packages
 RUN apt-get clean -y && \
