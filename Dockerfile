@@ -1,7 +1,6 @@
 FROM ubuntu:24.04
 
 ARG ZSDK_VERSION=0.16.4
-ARG PYTHON_VERSION=3.12
 
 ARG UID=1001
 ARG GID=1001
@@ -72,11 +71,9 @@ RUN apt-get update \
         wget \
         python3-venv \
         python3-dev \
-        #python${PYTHON_VERSION}-dev ?
         python3-pip \
         python3-setuptools \
         python3-tk \
-        #python${PYTHON_VERSION}-tk ?
         python3-wheel \
         xz-utils \
         file \
@@ -157,22 +154,27 @@ RUN apt-get update \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
-# --- Remove 'ubuntu' user and create USER_NAME user ---
+# --- Remove 'ubuntu' user and create 'user' user ---
 #
-RUN userdel -r ubuntu
-RUN groupadd -g $GID -o user
-RUN mkdir -p /etc/sudoers.d && useradd -u $UID -m -g user -G plugdev -G dialout user \
+RUN userdel --remove ubuntu \
+    && groupadd --gid $GID --non-unique user \
+    && mkdir --parents /etc/sudoers.d \
+    && useradd --uid $UID --create-home --gid user --groups plugdev,dialout user \
     && echo "user ALL = NOPASSWD: ALL" > /etc/sudoers.d/user \
-    && chmod 0440 /etc/sudoers.d/user
+    && chmod 0440 /etc/sudoers.d/user \
+    && chsh --shell /bin/bash user
 
-RUN chsh --shell /bin/bash user
-
-# Add entrypoint script
+#
+# --- Add entrypoint script ---
+#
 RUN --mount=type=bind,source=./entrypoint.sh,target=/tmp/entrypoint.sh \
     cp /tmp/entrypoint.sh /home/user/entrypoint.sh \
     && dos2unix /home/user/entrypoint.sh \
     && chmod +x /home/user/entrypoint.sh
 
+#
+# --- Become user ---
+#
 USER user
 
 ENTRYPOINT ["/home/user/entrypoint.sh"]
