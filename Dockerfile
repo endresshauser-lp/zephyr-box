@@ -75,6 +75,12 @@ RUN apt-get update \
         libmagic1 \
     && rm --recursive --force /var/lib/apt/lists/*
 
+# File way
+
+ARG CERT_FILE
+COPY $CERT_FILE /usr/local/share/ca-certificates/zscaler.crt
+RUN update-ca-certificates
+
 #
 # --- Zephyr SDK toolchain ---
 #
