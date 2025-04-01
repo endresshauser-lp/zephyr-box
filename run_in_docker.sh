@@ -66,6 +66,7 @@ docker run \
     --volume "$SSH_DIR":$HOME_CONTAINTER/.ssh \
     --volume /dev:/dev \
     --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume /usr/local/share/ca-certificates:/usr/local/share/ca-certificates \
     --env WEST_WORKSPACE="$WEST_WORKSPACE_CONTAINER" \
     --env PROJECT_ROOT="$PROJECT_ROOT_CONTAINER" \
     --env PYTHON_VENV="$PYTHON_VENV_CONTAINER" \

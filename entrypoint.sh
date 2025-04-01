@@ -29,6 +29,10 @@ then
     exit 1
 fi
 
+# Update CA certificates to include custom certificates, such as those for
+# corporate proxies
+sudo update-ca-certificates
+
 # Create and/or activate python virtual environment
 if [ -d "$PYTHON_VENV" ];
 then
