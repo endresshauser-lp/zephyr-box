@@ -32,6 +32,8 @@ RUN apt-get update \
         cppcheck \
         clang \
         minicom \
+        tmux \
+        socat \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
