@@ -33,6 +33,7 @@ RUN apt-get update \
         clang \
         minicom \
         tmux \
+        snmp \
         socat \
     && rm --recursive --force /var/lib/apt/lists/*
 
