@@ -52,6 +52,7 @@ RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/sudo-nopasswd
 # https://docs.zephyrproject.org/latest/develop/getting_started/index.html#install-dependencies
 # In addition,
 #   - libc6-dbg:i386, for debugging native-sim executables
+#   - valgrind, for leak checking using twister with option --enable-valgrind
 #
 RUN dpkg --add-architecture i386 \
     && apt-get update \
@@ -81,6 +82,7 @@ RUN dpkg --add-architecture i386 \
         libsdl2-dev \
         libmagic1 \
         libc6-dbg:i386 \
+        valgrind \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
