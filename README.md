@@ -18,7 +18,7 @@ It also provides an environment for running CI-jobs.
 7. Enjoy! Or not.
 
 If you want to run a specific command, you may also do `run_in_docker.sh <SPECIFIC COMMAND>`.
-You can build or flash from the calling context with `run_in_docker.sh west build` and `run_in_docker.sh west flash -r pyocd`.
+You can build or flash from the calling context with `run_in_docker.sh west build` and `run_in_docker.sh west flash -r probe-rs`.
 You can also run bash in Docker by `run_in_docker.sh bash`.
 Then you can also attach to running container with VSCode, but you won't have docker extensions and some other configurations.
 Please note that if only `on_docker_startup.sh` is changed, there is no need to rebuild the image!

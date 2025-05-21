@@ -1,3 +1,41 @@
+#
+# --- Stage 1 ---
+# Build probe-rs
+#
+FROM ubuntu:24.04 AS probe-rs
+
+ENV RUST_VERSION=1.87.0
+ENV PROBE_RS_VERSION=0.29.0
+
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo
+
+RUN apt-get update \
+    && apt-get upgrade --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends \
+        ca-certificates \
+        gcc \
+        libc6-dev \
+        wget \
+        pkg-config \
+        libudev-dev \
+    && rm --recursive --force /var/lib/apt/lists/*
+
+
+RUN wget --quiet --show-progress --progress=dot:giga \
+        https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-unknown-linux-gnu/rustup-init \
+    && echo "20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c rustup-init" | sha256sum -c - \
+    && chmod +x rustup-init \
+    && ./rustup-init -y --profile minimal --default-toolchain $RUST_VERSION --default-host x86_64-unknown-linux-gnu \
+    && rm rustup-init \
+    && . "$CARGO_HOME/env" \
+    && mkdir -p /opt/probe-rs \
+    && cargo install probe-rs-tools@=$PROBE_RS_VERSION --locked --root /opt/probe-rs --features remote
+
+#
+# --- Stage 2 ---
+# Build zephyr-box
+#
 FROM ubuntu:24.04
 
 ARG ZSDK_VERSION=0.16.8
@@ -186,6 +224,12 @@ RUN apt-get update \
     && sudo apt-get update \
     && sudo apt-get install gh --assume-yes \
     && rm --recursive --force /var/lib/apt/lists/*
+
+
+#
+# --- Install probe-rs ---
+#
+COPY --from=probe-rs /opt/probe-rs/bin/probe-rs /usr/local/bin/probe-rs
 
 #
 # --- Remove 'ubuntu' user and create 'user' user ---
