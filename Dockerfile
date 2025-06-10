@@ -115,6 +115,7 @@ RUN dpkg --add-architecture i386 \
         make \
         gcc \
         gdb \
+        gdbserver \
         gcc-multilib \
         g++-multilib \
         libsdl2-dev \
