@@ -66,9 +66,12 @@ RUN apt-get update \
         bzip2 \
         dos2unix \
         unzip \
-        clang-tidy \
         cppcheck \
+        llvm \
         clang \
+        libclang-rt-dev \
+        clangd \
+        clang-tidy \
         minicom \
         tmux \
         snmp \
