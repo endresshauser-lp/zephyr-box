@@ -67,16 +67,20 @@ RUN apt-get update \
         dos2unix \
         unzip \
         cppcheck \
-        llvm \
-        clang \
-        libclang-rt-dev \
-        clangd \
-        clang-tidy \
+        llvm-19 \
+        clang-19 \
+        libclang-rt-19-dev \
+        clangd-19 \
+        clang-tidy-19 \
+        libfuzzer-19-dev \
+        libunwind-19-dev \
         minicom \
         tmux \
         snmp \
         socat \
     && rm --recursive --force /var/lib/apt/lists/*
+
+ENV PATH="/usr/lib/llvm-19/bin:$PATH"
 
 #
 # --- Configuration ---
