@@ -5,6 +5,7 @@ set -e
 SSH_DIR=${SSH_DIR:-"${HOME}/.ssh"}
 RUN_LOCALLY=${RUN_LOCALLY:-"true"}
 RUN_WITH_TTY=${RUN_WITH_TTY:-"true"}
+CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"docker"}
 
 DOCKER_REGISTRY=${DOCKER_REGISTRY:-"ghcr.io/endresshauser-lp"}
 IMAGE_NAME="zephyr-box"
@@ -33,7 +34,7 @@ mkdir --parents "$WEST_WORKSPACE_HOST"
 
 if [ "$RUN_LOCALLY" = "true" ]; then
     # Build latest zephyr-box from scratch
-    docker build \
+    $CONTAINER_RUNTIME build \
         --network host \
         --build-arg="UID=$USER_UID" \
         --build-arg="GID=$USER_GID" \
@@ -55,7 +56,7 @@ else
     fi
 
     # Use already built zephyr-box image from remote with a tiny wrapper to get user UID and GID correct
-    docker build \
+    $CONTAINER_RUNTIME build \
          --build-arg="ZEPHYR_BOX_IMAGE=${DOCKER_REGISTRY}/$IMAGE_NAME:$IMAGE_VERSION" \
          --build-arg="UID=$USER_UID" \
          --build-arg="GID=$USER_GID" \
@@ -63,13 +64,12 @@ else
          --file "$DOCKER_DIR"/DockerfileUserWrapper .
 fi
 
-docker run \
+$CONTAINER_RUNTIME run \
     --network host $TTY_FLAG --interactive --rm --privileged \
     --volume "$WEST_WORKSPACE_HOST:$WEST_WORKSPACE_CONTAINER" \
     --volume "$PROJECT_ROOT_HOST:$PROJECT_ROOT_CONTAINER" \
     --volume "$SSH_DIR":$HOME_CONTAINTER/.ssh \
     --volume /dev:/dev \
-    --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume /usr/local/share/ca-certificates:/usr/local/share/ca-certificates \
     --env WEST_WORKSPACE="$WEST_WORKSPACE_CONTAINER" \
     --env PROJECT_ROOT="$PROJECT_ROOT_CONTAINER" \
