@@ -41,15 +41,19 @@ if [ "$RUN_LOCALLY" = "true" ]; then
         "$DOCKER_DIR"
 else
     # Get zephyr-box image version from Git tag
-    W_DIR=$(pwd)
-    cd "$DOCKER_DIR"
-    IMAGE_VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed -n 's/^v\([0-9]\+\.[0-9]\+\).*/\1/p')
-    cd "$W_DIR"
-    printf "Found from zephyr-box tag the IMAGE_VERSION $IMAGE_VERSION\n"
-    if [ -z "$IMAGE_VERSION" ]; then
-        printf "No valid Git tag found to determine the version of the Docker image to be pulled from the remote\n"
-        exit 1
+    IMAGE_VERSION=$(git -C "$DOCKER_DIR" for-each-ref --points-at=HEAD --count=1 --format='%(refname)' 'refs/pull/*/head' | sed 's#refs/pull/\([0-9]\+\)/head#pr-\1#')
+    if [ ! -z "$IMAGE_VERSION" ]; then
+            printf "Using zephyr-box from pull request: %s\n" "${DOCKER_REGISTRY}/$IMAGE_NAME:$IMAGE_VERSION"
+    else
+        IMAGE_VERSION=$(git -C "$DOCKER_DIR" describe --tags --abbrev=0 2>/dev/null | sed -n 's/^v\([0-9]\+\.[0-9]\+\).*/\1/p')
+        if [ -z "$IMAGE_VERSION" ]; then
+            printf "No valid Git tag found to determine the version of the Docker image to be pulled from the remote\n"
+            exit 1
+        fi
+
+        printf "Using zephyr-box from git tag: %s\n" "${DOCKER_REGISTRY}/$IMAGE_NAME:$IMAGE_VERSION"
     fi
+
     # Use already built zephyr-box image from remote with a tiny wrapper to get user UID and GID correct
     docker build \
          --build-arg="ZEPHYR_BOX_IMAGE=${DOCKER_REGISTRY}/$IMAGE_NAME:$IMAGE_VERSION" \
