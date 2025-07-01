@@ -6,7 +6,7 @@ SSH_DIR=${SSH_DIR:-"${HOME}/.ssh"}
 RUN_LOCALLY=${RUN_LOCALLY:-"true"}
 RUN_WITH_TTY=${RUN_WITH_TTY:-"true"}
 
-DOCKER_REGISTRY=${DOCKER_REGISTRY:-"docker.io/endresshauser"}
+DOCKER_REGISTRY=${DOCKER_REGISTRY:-"ghcr.io/endresshauser-lp"}
 IMAGE_NAME="zephyr-box"
 
 USER_UID=$(id -u "$(whoami)")
