@@ -74,6 +74,7 @@ RUN apt-get update \
         clang-tidy-19 \
         libfuzzer-19-dev \
         libunwind-19-dev \
+        dotnet-sdk-8.0 \
         minicom \
         tmux \
         snmp \
