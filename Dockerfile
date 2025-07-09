@@ -234,6 +234,18 @@ RUN apt-get update \
     && sudo apt-get install gh --assume-yes \
     && rm --recursive --force /var/lib/apt/lists/*
 
+#
+# --- Install PowerShell ---
+#
+RUN wget --quiet --show-progress --progress=dot:giga \
+        https://github.com/PowerShell/PowerShell/releases/download/v7.4.11/powershell_7.4.11-1.deb_amd64.deb \
+    && echo "0adbcf7d3cf4f78d86b1fa568bede76a7aaaacb97089c52a2f452c799bbf38fd powershell_7.4.11-1.deb_amd64.deb" | sha256sum -c - \
+    && sudo apt install --assume-yes --no-install-recommends \
+        ./powershell_7.4.11-1.deb_amd64.deb \
+    && rm powershell_7.4.11-1.deb_amd64.deb \
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && pwsh -Command "Set-PSRepository -InstallationPolicy Trusted -Verbose -Name PSGallery" \
+    && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
 
 #
 # --- Install probe-rs ---
