@@ -7,6 +7,10 @@ RUN_LOCALLY=${RUN_LOCALLY:-"true"}
 RUN_WITH_TTY=${RUN_WITH_TTY:-"true"}
 CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"docker"}
 
+EXTRA_VOLUMES=""
+MOUNT_GITCONFIG=${MOUNT_GITCONFIG:-"false"}
+GITCONFIG=${GITCONFIG:-"${HOME}/.gitconfig"}
+
 DOCKER_REGISTRY=${DOCKER_REGISTRY:-"ghcr.io/endresshauser-lp"}
 IMAGE_NAME="zephyr-box"
 
@@ -18,8 +22,8 @@ USER_GID=$(id -g "$(whoami)")
 DOCKER_DIR=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
 PROJECT_ROOT_HOST=$(realpath "$(dirname "$DOCKER_DIR")")
 WEST_WORKSPACE_HOST=$PROJECT_ROOT_HOST/.west_workspace
-HOME_CONTAINTER=/home/user
-WEST_WORKSPACE_CONTAINER=$HOME_CONTAINTER/west_workspace
+HOME_CONTAINER=/home/user
+WEST_WORKSPACE_CONTAINER=$HOME_CONTAINER/west_workspace
 PYTHON_VENV_CONTAINER=$WEST_WORKSPACE_CONTAINER/.pyEnv
 PROJECT_ROOT_CONTAINER=$WEST_WORKSPACE_CONTAINER/$(basename "$PROJECT_ROOT_HOST")
 REQUIREMENTS_TXT="$PROJECT_ROOT_CONTAINER/requirements.txt"
@@ -64,13 +68,18 @@ else
          --file "$DOCKER_DIR"/DockerfileUserWrapper .
 fi
 
+if [ "$MOUNT_GITCONFIG" = "true" ]; then
+    EXTRA_VOLUMES+="--volume $GITCONFIG:$HOME_CONTAINER/.gitconfig"
+fi
+
 $CONTAINER_RUNTIME run \
     --network host $TTY_FLAG --interactive --rm --privileged \
     --volume "$WEST_WORKSPACE_HOST:$WEST_WORKSPACE_CONTAINER" \
     --volume "$PROJECT_ROOT_HOST:$PROJECT_ROOT_CONTAINER" \
-    --volume "$SSH_DIR":$HOME_CONTAINTER/.ssh \
+    --volume "$SSH_DIR":$HOME_CONTAINER/.ssh \
     --volume /dev:/dev \
     --volume /usr/local/share/ca-certificates:/usr/local/share/ca-certificates \
+    $EXTRA_VOLUMES \
     --env WEST_WORKSPACE="$WEST_WORKSPACE_CONTAINER" \
     --env PROJECT_ROOT="$PROJECT_ROOT_CONTAINER" \
     --env PYTHON_VENV="$PYTHON_VENV_CONTAINER" \
