@@ -69,7 +69,11 @@ else
 fi
 
 if [ "$MOUNT_GITCONFIG" = "true" ]; then
-    EXTRA_VOLUMES+="--volume $GITCONFIG:$HOME_CONTAINER/.gitconfig"
+    EXTRA_VOLUMES+=" --volume $GITCONFIG:$HOME_CONTAINER/.gitconfig"
+fi
+
+if [ -d "$HOME/.config/gh" ]; then
+    EXTRA_VOLUMES+=" --volume $HOME/.config/gh:$HOME_CONTAINER/.config/gh"
 fi
 
 $CONTAINER_RUNTIME run \
@@ -85,4 +89,5 @@ $CONTAINER_RUNTIME run \
     --env PYTHON_VENV="$PYTHON_VENV_CONTAINER" \
     --env REQUIREMENTS_TXT="$REQUIREMENTS_TXT" \
     --env ON_DOCKER_STARTUP="$ON_DOCKER_STARTUP" \
+    --env GH_TOKEN --env GITHUB_TOKEN \
     zephyr-box "$@"
