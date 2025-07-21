@@ -71,6 +71,7 @@ RUN apt-get update \
         clang-19 \
         libclang-rt-19-dev \
         clangd-19 \
+        lldb-19 \
         clang-tidy-19 \
         libfuzzer-19-dev \
         libunwind-19-dev \
