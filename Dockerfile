@@ -232,7 +232,13 @@ RUN apt-get update \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list \
     && sudo apt-get update \
     && sudo apt-get install gh --assume-yes \
-    && rm --recursive --force /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && echo "[credential \"https://github.com\"]" >> /etc/gitconfig \
+    && echo "    helper =" >> /etc/gitconfig \
+    && echo "    helper = !/usr/bin/gh auth git-credential" >> /etc/gitconfig \
+    && echo "[credential \"https://gist.github.com\"]" >> /etc/gitconfig \
+    && echo "    helper =" >> /etc/gitconfig \
+    && echo "    helper = !/usr/bin/gh auth git-credential" >> /etc/gitconfig
 
 #
 # --- Install PowerShell ---
