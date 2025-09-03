@@ -47,7 +47,8 @@ if [ "$RUN_LOCALLY" = "true" ]; then
         "$DOCKER_DIR"
 else
     # Get zephyr-box image version from Git tag
-    IMAGE_VERSION=$(git -C "$DOCKER_DIR" for-each-ref --points-at=HEAD --count=1 --format='%(refname)' 'refs/pull/*/head' | sed 's#refs/pull/\([0-9]\+\)/head#pr-\1#')
+    GIT_REV=$(git -C "$DOCKER_DIR" rev-parse HEAD)
+    IMAGE_VERSION=$(git -C "$DOCKER_DIR" ls-remote origin 'refs/pull/*/head' | grep "$GIT_REV" | sed 's#.*refs/pull/\([0-9]\+\)/head#pr-\1#')
     if [ ! -z "$IMAGE_VERSION" ]; then
             printf "Using zephyr-box from pull request: %s\n" "${DOCKER_REGISTRY}/$IMAGE_NAME:$IMAGE_VERSION"
     else
