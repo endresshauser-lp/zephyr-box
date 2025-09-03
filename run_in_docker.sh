@@ -5,6 +5,7 @@ set -e
 SSH_DIR=${SSH_DIR:-"${HOME}/.ssh"}
 RUN_LOCALLY=${RUN_LOCALLY:-"true"}
 RUN_WITH_TTY=${RUN_WITH_TTY:-"true"}
+RUN_OFFLINE=${RUN_OFFLINE:-"false"}
 CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"docker"}
 
 EXTRA_VOLUMES=""
@@ -46,7 +47,8 @@ if [ "$RUN_LOCALLY" = "true" ]; then
         "$DOCKER_DIR"
 else
     # Get zephyr-box image version from Git tag
-    IMAGE_VERSION=$(git -C "$DOCKER_DIR" for-each-ref --points-at=HEAD --count=1 --format='%(refname)' 'refs/pull/*/head' | sed 's#refs/pull/\([0-9]\+\)/head#pr-\1#')
+    GIT_REV=$(git -C "$DOCKER_DIR" rev-parse HEAD)
+    IMAGE_VERSION=$(git -C "$DOCKER_DIR" ls-remote origin 'refs/pull/*/head' | grep "$GIT_REV" | sed 's#.*refs/pull/\([0-9]\+\)/head#pr-\1#')
     if [ ! -z "$IMAGE_VERSION" ]; then
             printf "Using zephyr-box from pull request: %s\n" "${DOCKER_REGISTRY}/$IMAGE_NAME:$IMAGE_VERSION"
     else
@@ -86,6 +88,7 @@ $CONTAINER_RUNTIME run \
     $EXTRA_VOLUMES \
     --env WEST_WORKSPACE="$WEST_WORKSPACE_CONTAINER" \
     --env PROJECT_ROOT="$PROJECT_ROOT_CONTAINER" \
+    --env RUN_OFFLINE="$RUN_OFFLINE" \
     --env PYTHON_VENV="$PYTHON_VENV_CONTAINER" \
     --env REQUIREMENTS_TXT="$REQUIREMENTS_TXT" \
     --env ON_DOCKER_STARTUP="$ON_DOCKER_STARTUP" \
