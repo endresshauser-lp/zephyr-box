@@ -44,27 +44,37 @@ fi
 
 # Initialize and/or update west work space
 cd "$WEST_WORKSPACE"
-pip3 install west
+
+if [ "$RUN_OFFLINE" = "false" ]; then
+    pip3 install west
+fi
+
 if [ -d "$WEST_WORKSPACE/.west" ];
 then
     echo "West already initialized"
 else
     west init --local "$PROJECT_ROOT"
 fi
-west update
+
+if [ "$RUN_OFFLINE" = "false" ]; then
+    west update
+fi
+
 west zephyr-export
 
-# Install pip requirements for zephyr
-pip3 install --verbose --upgrade --no-cache-dir \
-    --requirement "$WEST_WORKSPACE/zephyr/scripts/requirements.txt"
-
-# Install pip requirements for project, if set as REQUIREMENTS_TXT
-if [ -f "$REQUIREMENTS_TXT" ];
-then
+if [ "$RUN_OFFLINE" = "false" ]; then
+    # Install pip requirements for zephyr
     pip3 install --verbose --upgrade --no-cache-dir \
-        --requirement "$REQUIREMENTS_TXT"
-else
-    echo "requirements.txt not found (path:'$REQUIREMENTS_TXT'). No action."
+        --requirement "$WEST_WORKSPACE/zephyr/scripts/requirements.txt"
+
+    # Install pip requirements for project, if set as REQUIREMENTS_TXT
+    if [ -f "$REQUIREMENTS_TXT" ];
+    then
+        pip3 install --verbose --upgrade --no-cache-dir \
+            --requirement "$REQUIREMENTS_TXT"
+    else
+        echo "requirements.txt not found (path:'$REQUIREMENTS_TXT'). No action."
+    fi
 fi
 
 # Execute project specific startup logic, if specified as ON_DOCKER_STARTUP
