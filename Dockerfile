@@ -122,16 +122,19 @@ RUN dpkg --add-architecture i386 \
         xz-utils \
         file \
         make \
-        gcc \
         gdb \
         gdbserver \
-        gcc-multilib \
-        g++-multilib \
+        gcc-14 \
+        gcc-14-multilib \
+        g++-14-multilib \
         libsdl2-dev \
         libmagic1 \
         libc6-dbg:i386 \
         valgrind \
-    && rm --recursive --force /var/lib/apt/lists/*
+    && rm --recursive --force /var/lib/apt/lists/* \
+    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-14 50; done \
+    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-14 50; done \
+    && ln -s x86_64-linux-gnu/asm /usr/include/asm
 
 #
 # --- Zephyr SDK toolchain ---
