@@ -67,14 +67,14 @@ RUN apt-get update \
         dos2unix \
         unzip \
         cppcheck \
-        llvm-19 \
-        clang-19 \
-        libclang-rt-19-dev \
-        clangd-19 \
-        lldb-19 \
-        clang-tidy-19 \
-        libfuzzer-19-dev \
-        libunwind-19-dev \
+        llvm-20 \
+        clang-20 \
+        libclang-rt-20-dev \
+        clangd-20 \
+        lldb-20 \
+        clang-tidy-20 \
+        libfuzzer-20-dev \
+        libunwind-20-dev \
         dotnet-sdk-8.0 \
         minicom \
         tmux \
@@ -82,7 +82,7 @@ RUN apt-get update \
         socat \
     && rm --recursive --force /var/lib/apt/lists/*
 
-ENV PATH="/usr/lib/llvm-19/bin:$PATH"
+ENV PATH="/usr/lib/llvm-20/bin:$PATH"
 
 #
 # --- Configuration ---
