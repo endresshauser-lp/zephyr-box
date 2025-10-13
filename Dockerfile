@@ -225,6 +225,21 @@ RUN wget --quiet --show-progress --progress=dot:giga \
     && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
 
 #
+# --- Install JLink ---
+#
+RUN wget --quiet --show-progress --progress=dot:giga \
+        --post-data "accept_license_agreement=accepted&submit=Download+software" \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V876_x86_64.deb \
+    && echo "4bea8c1b7bb97a4356490fd482e2d3316b1c20944a2ee413a13927ef8845fc10 JLink_Linux_V876_x86_64.deb" | sha256sum -c - \
+    && sudo apt-get update \
+    && sudo ln -s /usr/bin/true /usr/bin/udevadm \
+    && sudo apt install --assume-yes --no-install-recommends \
+        ./JLink_Linux_V876_x86_64.deb \
+    && rm JLink_Linux_V876_x86_64.deb \
+    && sudo rm -f /usr/bin/udevadm \
+    && rm --recursive --force /var/lib/apt/lists/*
+
+#
 # --- Install probe-rs ---
 #
 COPY --from=probe-rs /opt/probe-rs/bin/probe-rs /usr/local/bin/probe-rs
