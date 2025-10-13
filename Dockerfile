@@ -171,20 +171,6 @@ RUN apt-get update \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
-# --- NRF command line tools ---
-#
-RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-15-1/nrf-command-line-tools-10.15.1_linux-amd64.zip \
-    && unzip nrf-command-line-tools-10.15.1_linux-amd64.zip \
-    && dpkg -i --force-overwrite nrf-command-line-tools_10.15.1_amd64.deb \
-    && dpkg -i --force-overwrite JLink_Linux_V758b_x86_64.deb \
-    && rm nrf-command-line-tools-10.15.1_linux-amd64.zip \
-    && rm JLink_Linux_V758b_x86_64.deb \
-    && rm nrf-command-line-tools-10.15.1_Linux-amd64.tar.gz \
-    && rm JLink_Linux_V758b_x86_64.tgz \
-    && rm nrf-command-line-tools-10.15.1-1.amd64.rpm \
-    && rm nrf-command-line-tools_10.15.1_amd64.deb
-
-#
 # --- APT packages for SD-card image ---
 #
 RUN apt-get update \
