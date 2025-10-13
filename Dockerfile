@@ -163,46 +163,12 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.78/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.76/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
     && rm chromedriver-linux64.zip \
     && rm --recursive --force /var/lib/apt/lists/*
-
-#
-# --- Puncover ---
-#
-WORKDIR /opt/toolchains
-RUN pip3 install --verbose --upgrade --no-cache-dir --break-system-packages \
-        'puncover@git+https://github.com/HBehrens/puncover@0.4.2' \
-    && wget --quiet --show-progress --progress=dot:giga --output-document archive.tar.xz \
-        "https://developer.arm.com/-/media/Files/downloads/gnu/12.2.mpacbti-rel1/binrel/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi.tar.xz?rev=71e595a1f2b6457bab9242bc4a40db90&hash=37B0C59767BAE297AEB8967E7C54705BAE9A4B95" \
-    && echo 1f2277f96903551ac7b2766f17513542 archive.tar.xz > /tmp/archive.md5 \
-    && md5sum --check /tmp/archive.md5 \
-    && rm /tmp/archive.md5 \
-    && tar --extract --file archive.tar.xz \
-    && rm archive.tar.xz \
-    && ln --symbolic arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc /usr/bin/arm-none-eabi-gcc \
-    && ln --symbolic arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-g++ /usr/bin/arm-none-eabi-g++ \
-    && ln --symbolic arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gdb /usr/bin/arm-none-eabi-gdb \
-    && ln --symbolic arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size /usr/bin/arm-none-eabi-size \
-    && ln --symbolic arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy \
-    && ln --symbolic arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-objdump /usr/bin/arm-none-eabi-objdump
-
-#
-# --- NRF command line tools ---
-#
-RUN wget https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-15-1/nrf-command-line-tools-10.15.1_linux-amd64.zip \
-    && unzip nrf-command-line-tools-10.15.1_linux-amd64.zip \
-    && dpkg -i --force-overwrite nrf-command-line-tools_10.15.1_amd64.deb \
-    && dpkg -i --force-overwrite JLink_Linux_V758b_x86_64.deb \
-    && rm nrf-command-line-tools-10.15.1_linux-amd64.zip \
-    && rm JLink_Linux_V758b_x86_64.deb \
-    && rm nrf-command-line-tools-10.15.1_Linux-amd64.tar.gz \
-    && rm JLink_Linux_V758b_x86_64.tgz \
-    && rm nrf-command-line-tools-10.15.1-1.amd64.rpm \
-    && rm nrf-command-line-tools_10.15.1_amd64.deb
 
 #
 # --- APT packages for SD-card image ---
@@ -221,11 +187,11 @@ RUN apt-get update \
 RUN apt-get update \
     && sudo apt-get install ca-certificates curl gnupg --assume-yes \
     && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor --output /etc/apt/keyrings/nodesource.gpg \
-    && NODE_MAJOR=20 \
+    && NODE_MAJOR=24 \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list \
     && sudo apt-get update \
     && sudo apt-get install nodejs --assume-yes \
-    && sudo npm install -g cspell@8.x \
+    && sudo npm install -g cspell@9.x \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
@@ -248,14 +214,30 @@ RUN apt-get update \
 # --- Install PowerShell ---
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
-        https://github.com/PowerShell/PowerShell/releases/download/v7.4.11/powershell_7.4.11-1.deb_amd64.deb \
-    && echo "0adbcf7d3cf4f78d86b1fa568bede76a7aaaacb97089c52a2f452c799bbf38fd powershell_7.4.11-1.deb_amd64.deb" | sha256sum -c - \
+        https://github.com/PowerShell/PowerShell/releases/download/v7.5.3/powershell_7.5.3-1.deb_amd64.deb \
+    && echo "e2c7c338281c165cfc2b8ddcaaaf923d49353daef4f1a504dbc8b26b7349ce20 powershell_7.5.3-1.deb_amd64.deb" | sha256sum -c - \
+    && sudo apt-get update \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./powershell_7.4.11-1.deb_amd64.deb \
-    && rm powershell_7.4.11-1.deb_amd64.deb \
+        ./powershell_7.5.3-1.deb_amd64.deb \
+    && rm powershell_7.5.3-1.deb_amd64.deb \
     && rm --recursive --force /var/lib/apt/lists/* \
     && pwsh -Command "Set-PSRepository -InstallationPolicy Trusted -Verbose -Name PSGallery" \
     && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
+
+#
+# --- Install JLink ---
+#
+RUN wget --quiet --show-progress --progress=dot:giga \
+        --post-data "accept_license_agreement=accepted&submit=Download+software" \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V876_x86_64.deb \
+    && echo "4bea8c1b7bb97a4356490fd482e2d3316b1c20944a2ee413a13927ef8845fc10 JLink_Linux_V876_x86_64.deb" | sha256sum -c - \
+    && sudo apt-get update \
+    && sudo ln -s /usr/bin/true /usr/bin/udevadm \
+    && sudo apt install --assume-yes --no-install-recommends \
+        ./JLink_Linux_V876_x86_64.deb \
+    && rm JLink_Linux_V876_x86_64.deb \
+    && sudo rm -f /usr/bin/udevadm \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 #
 # --- Install probe-rs ---
