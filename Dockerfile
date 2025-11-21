@@ -264,6 +264,12 @@ RUN --mount=type=bind,source=./entrypoint.sh,target=/tmp/entrypoint.sh \
     && chmod +x /home/user/entrypoint.sh
 
 #
+# --- Add mountpoint for west workspace
+#
+RUN mkdir /home/user/west_workspace \
+    && chown user:user /home/user/west_workspace
+
+#
 # --- Become user ---
 #
 USER user
