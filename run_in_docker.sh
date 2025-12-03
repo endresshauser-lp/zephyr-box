@@ -35,7 +35,7 @@ if [ "$RUN_WITH_TTY" = "true" ]; then
     TTY_FLAG="--tty"
 fi
 
-mkdir --parents "$WEST_WORKSPACE_HOST"
+mkdir -p "$WEST_WORKSPACE_HOST"
 
 if [ "$RUN_LOCALLY" = "true" ]; then
     # Build latest zephyr-box from scratch
