@@ -4,8 +4,8 @@
 #
 FROM ubuntu:24.04 AS probe-rs
 
-ENV RUST_VERSION=1.87.0
-ENV PROBE_RS_VERSION=0.29.0
+ENV RUST_VERSION=1.90.0
+ENV PROBE_RS_VERSION=0.30.0
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo
@@ -38,7 +38,7 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 FROM ubuntu:24.04
 
-ARG ZSDK_VERSION=0.17.1
+ARG ZSDK_VERSION=0.17.4
 
 ARG UID=1001
 ARG GID=1001
@@ -150,7 +150,7 @@ RUN wget --quiet --show-progress --progress=dot:giga \
     && cd zephyr-sdk-${ZSDK_VERSION} \
     # -t toolchain
     # -h host tools
-    && ./setup.sh -h -t x86_64-zephyr-elf -t arm-zephyr-eabi
+    && ./setup.sh -h -t arm-zephyr-eabi
 ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 
 #
@@ -163,7 +163,7 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/141.0.7390.76/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/143.0.7499.169/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
@@ -214,12 +214,12 @@ RUN apt-get update \
 # --- Install PowerShell ---
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
-        https://github.com/PowerShell/PowerShell/releases/download/v7.5.3/powershell_7.5.3-1.deb_amd64.deb \
-    && echo "e2c7c338281c165cfc2b8ddcaaaf923d49353daef4f1a504dbc8b26b7349ce20 powershell_7.5.3-1.deb_amd64.deb" | sha256sum -c - \
+        https://github.com/PowerShell/PowerShell/releases/download/v7.5.4/powershell_7.5.4-1.deb_amd64.deb \
+    && echo "17036f67f65d81ed2b23d0d247edc2b2ac58abeb721f08927aed8a3dffe41d42 powershell_7.5.4-1.deb_amd64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./powershell_7.5.3-1.deb_amd64.deb \
-    && rm powershell_7.5.3-1.deb_amd64.deb \
+        ./powershell_7.5.4-1.deb_amd64.deb \
+    && rm powershell_7.5.4-1.deb_amd64.deb \
     && rm --recursive --force /var/lib/apt/lists/* \
     && pwsh -Command "Set-PSRepository -InstallationPolicy Trusted -Verbose -Name PSGallery" \
     && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
@@ -229,13 +229,13 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
         --post-data "accept_license_agreement=accepted&submit=Download+software" \
-        https://www.segger.com/downloads/jlink/JLink_Linux_V876_x86_64.deb \
-    && echo "4bea8c1b7bb97a4356490fd482e2d3316b1c20944a2ee413a13927ef8845fc10 JLink_Linux_V876_x86_64.deb" | sha256sum -c - \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V896_x86_64.deb \
+    && echo "8a34aa55f3bae1734cd234bed71c4af763b94efeed8944189b5ac3a4afb8e137 JLink_Linux_V896_x86_64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo ln -s /usr/bin/true /usr/bin/udevadm \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./JLink_Linux_V876_x86_64.deb \
-    && rm JLink_Linux_V876_x86_64.deb \
+        ./JLink_Linux_V896_x86_64.deb \
+    && rm JLink_Linux_V896_x86_64.deb \
     && sudo rm -f /usr/bin/udevadm \
     && rm --recursive --force /var/lib/apt/lists/*
 
