@@ -134,6 +134,8 @@ RUN dpkg --add-architecture i386 \
     && rm --recursive --force /var/lib/apt/lists/* \
     && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-14 50; done \
     && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-14 50; done \
+    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 50 \
+    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 50 \
     && ln -s x86_64-linux-gnu/asm /usr/include/asm
 
 #
