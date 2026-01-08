@@ -131,7 +131,8 @@ RUN dpkg --add-architecture i386 \
         libmagic1 \
         libc6-dbg:i386 \
         valgrind \
-        imagemagick \
+        exiftool \
+        jq \
     && rm --recursive --force /var/lib/apt/lists/* \
     && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-14 50; done \
     && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-14 50; done \
