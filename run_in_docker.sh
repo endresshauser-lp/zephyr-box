@@ -78,6 +78,14 @@ if [ -d "$HOME/.config/gh" ]; then
     EXTRA_VOLUMES+=" --volume $HOME/.config/gh:$HOME_CONTAINER/.config/gh"
 fi
 
+EXTRA_ENV_ARGS=""
+if [ -n "$EXTRA_ENVS" ]; then
+    IFS=';' read -ra ENV_NAMES <<< "$EXTRA_ENVS"
+    for name in "${ENV_NAMES[@]}"; do
+        EXTRA_ENV_ARGS+=" --env $name"
+    done
+fi
+
 $CONTAINER_RUNTIME run \
     --network host $TTY_FLAG --interactive --rm --privileged \
     --volume "$WEST_WORKSPACE_HOST:$WEST_WORKSPACE_CONTAINER" \
@@ -93,4 +101,5 @@ $CONTAINER_RUNTIME run \
     --env REQUIREMENTS_TXT="$REQUIREMENTS_TXT" \
     --env ON_DOCKER_STARTUP="$ON_DOCKER_STARTUP" \
     --env GH_TOKEN --env GITHUB_TOKEN \
+    $EXTRA_ENV_ARGS \
     zephyr-box "$@"
