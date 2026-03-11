@@ -38,7 +38,7 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 FROM ubuntu:24.04
 
-ARG ZSDK_VERSION=0.17.4
+ARG ZSDK_VERSION=1.0.0-rc1
 
 ARG UID=1001
 ARG GID=1001
@@ -154,7 +154,8 @@ RUN wget --quiet --show-progress --progress=dot:giga \
     && cd zephyr-sdk-${ZSDK_VERSION} \
     # -t toolchain
     # -h host tools
-    && ./setup.sh -h -t arm-zephyr-eabi
+    # -l llvm
+    && ./setup.sh -h -l -t arm-zephyr-eabi
 ENV ZEPHYR_TOOLCHAIN_PATH=/opt/zephyr-sdk-${ZSDK_VERSION}
 
 #
