@@ -38,7 +38,7 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 FROM ubuntu:24.04
 
-ARG ZSDK_VERSION=1.0.0-rc1
+ARG ZSDK_VERSION=1.0.0
 
 ARG UID=1001
 ARG GID=1001
