@@ -80,6 +80,9 @@ RUN apt-get update \
         tmux \
         snmp \
         socat \
+        bash-completion \
+        mc \
+        less \
     && rm --recursive --force /var/lib/apt/lists/*
 
 ENV PATH="/usr/lib/llvm-20/bin:$PATH"
