@@ -38,7 +38,7 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 FROM ubuntu:24.04
 
-ARG ZSDK_VERSION=1.0.0
+ARG ZSDK_VERSION=1.0.1
 
 ARG UID=1001
 ARG GID=1001
@@ -171,7 +171,7 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/146.0.7680.153/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/147.0.7727.55/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
@@ -237,13 +237,13 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
         --post-data "accept_license_agreement=accepted&submit=Download+software" \
-        https://www.segger.com/downloads/jlink/JLink_Linux_V928_x86_64.deb \
-    && echo "30c9209048711fea3b1829c82fcfcef6134eec3eb983402613f74a12de7e0124 JLink_Linux_V928_x86_64.deb" | sha256sum -c - \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V934b_x86_64.deb \
+    && echo "a9905c699f7b814beead9cbf94a3d945d89e01cb0beab03d7bfc35de157d31a4 JLink_Linux_V934b_x86_64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo ln -s /usr/bin/true /usr/bin/udevadm \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./JLink_Linux_V928_x86_64.deb \
-    && rm JLink_Linux_V928_x86_64.deb \
+        ./JLink_Linux_V934b_x86_64.deb \
+    && rm JLink_Linux_V934b_x86_64.deb \
     && sudo rm -f /usr/bin/udevadm \
     && rm --recursive --force /var/lib/apt/lists/*
 
