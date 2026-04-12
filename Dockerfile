@@ -190,7 +190,7 @@ RUN apt-get update \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
-# --- install nodejs used for cspell ---
+# --- install nodejs used for cspell and dts-linter ---
 #
 RUN apt-get update \
     && sudo apt-get install ca-certificates curl gnupg --assume-yes \
@@ -199,7 +199,7 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list \
     && sudo apt-get update \
     && sudo apt-get install nodejs --assume-yes \
-    && sudo npm install -g cspell@9.x \
+    && sudo npm install -g cspell@9.x dts-linter@0.5.x \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
