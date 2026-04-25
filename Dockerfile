@@ -2,7 +2,7 @@
 # --- Stage 1 ---
 # Build probe-rs
 #
-FROM ubuntu:24.04 AS probe-rs
+FROM ubuntu:26.04 AS probe-rs
 
 ENV RUST_VERSION=1.90.0
 ENV PROBE_RS_VERSION=0.31.0
@@ -36,7 +36,7 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 # --- Stage 2 ---
 # Build zephyr-box
 #
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ARG ZSDK_VERSION=1.0.1
 
@@ -61,21 +61,24 @@ RUN apt-get update \
         pkg-config \
         iproute2 \
         openocd \
+        libusb-1.0-0-dev \
+        libxml2-dev \
+        libxslt1-dev \
         iptables \
         ssh \
         bzip2 \
         dos2unix \
         unzip \
         cppcheck \
-        llvm-20 \
-        clang-20 \
-        libclang-rt-20-dev \
-        clangd-20 \
-        lldb-20 \
-        clang-tidy-20 \
-        libfuzzer-20-dev \
-        libunwind-20-dev \
-        dotnet-sdk-8.0 \
+        llvm-22 \
+        clang-22 \
+        libclang-rt-22-dev \
+        clangd-22 \
+        lldb-22 \
+        clang-tidy-22 \
+        libfuzzer-22-dev \
+        libunwind-22-dev \
+        dotnet-sdk-10.0 \
         minicom \
         tmux \
         snmp \
@@ -85,7 +88,7 @@ RUN apt-get update \
         less \
     && rm --recursive --force /var/lib/apt/lists/*
 
-ENV PATH="/usr/lib/llvm-20/bin:$PATH"
+ENV PATH="/usr/lib/llvm-22/bin:$PATH"
 
 #
 # --- Configuration ---
@@ -127,9 +130,9 @@ RUN dpkg --add-architecture i386 \
         make \
         gdb \
         gdbserver \
-        gcc-14 \
-        gcc-14-multilib \
-        g++-14-multilib \
+        gcc-16 \
+        gcc-16-multilib \
+        g++-16-multilib \
         libsdl2-dev \
         libmagic1 \
         libc6-dbg:i386 \
@@ -137,10 +140,10 @@ RUN dpkg --add-architecture i386 \
         exiftool \
         jq \
     && rm --recursive --force /var/lib/apt/lists/* \
-    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-14 50; done \
-    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-14 50; done \
-    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 50 \
-    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 50 \
+    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-16 50; done \
+    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-16 50; done \
+    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-16 50 \
+    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-16 50 \
     && ln -s x86_64-linux-gnu/asm /usr/include/asm
 
 #
