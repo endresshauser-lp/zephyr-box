@@ -46,7 +46,7 @@ fi
 cd "$WEST_WORKSPACE"
 
 if [ "$RUN_OFFLINE" = "false" ]; then
-    pip3 install west
+    pip3 install west jsonschema
 fi
 
 if [ -d "$WEST_WORKSPACE/.west" ];
