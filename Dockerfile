@@ -143,6 +143,12 @@ RUN dpkg --add-architecture i386 \
     && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 50 \
     && ln -s x86_64-linux-gnu/asm /usr/include/asm
 
+
+# --- ccache: allow the Ubuntu 24.04 ccache (4.9.1) to be used by Zephyr ---
+ENV CCACHE_IGNOREOPTIONS='-specs=* --specs=*'
+ENV CCACHE_CONFIGPATH=/etc/ccache.conf
+COPY ./ccache.conf /etc/ccache.conf
+
 #
 # --- Zephyr SDK toolchain ---
 #
