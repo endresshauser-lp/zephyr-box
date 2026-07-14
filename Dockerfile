@@ -33,6 +33,33 @@ RUN wget --quiet --show-progress --progress=dot:giga \
     && cargo install probe-rs-tools@=$PROBE_RS_VERSION --locked --root /opt/probe-rs --features remote
 
 #
+# Backport ccache from Ubuntu 26.04 (build from source for 24.04)
+#
+FROM ubuntu:26.04 AS ccache-source
+
+RUN sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources \
+    && apt-get update \
+    && apt-get install --assume-yes --no-install-recommends dpkg-dev \
+    && apt-get source --download-only ccache \
+    && mv ccache_*.dsc ccache_*.tar.* /tmp/
+
+FROM ubuntu:24.04 AS ccache-backport
+
+COPY --from=ccache-source /tmp/ccache_* /tmp/src/
+
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends \
+        dpkg-dev \
+        devscripts \
+        equivs \
+    && cd /tmp/src \
+    && dpkg-source --extract ccache_*.dsc /tmp/build \
+    && cd /tmp/build \
+    && mk-build-deps --install --tool "apt-get --assume-yes --no-install-recommends" \
+    && dpkg-buildpackage --unsigned-source --unsigned-changes --build=binary \
+    && mv /tmp/ccache_*.deb /tmp/ccache.deb
+
+#
 # --- Stage 2 ---
 # Build zephyr-box
 #
@@ -112,7 +139,6 @@ RUN dpkg --add-architecture i386 \
         cmake \
         ninja-build \
         gperf \
-        ccache \
         dfu-util \
         device-tree-compiler \
         wget \
@@ -142,6 +168,15 @@ RUN dpkg --add-architecture i386 \
     && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 50 \
     && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 50 \
     && ln -s x86_64-linux-gnu/asm /usr/include/asm
+
+#
+# --- Install backported ccache from Ubuntu 26.04 ---
+#
+COPY --from=ccache-backport /tmp/ccache.deb /tmp/ccache.deb
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends /tmp/ccache.deb \
+    && rm /tmp/ccache.deb \
+    && rm --recursive --force /var/lib/apt/lists/*
 
 #
 # --- Zephyr SDK toolchain ---
