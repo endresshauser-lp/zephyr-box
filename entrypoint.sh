@@ -60,8 +60,6 @@ if [ "$RUN_OFFLINE" = "false" ]; then
     west update
 fi
 
-west zephyr-export
-
 if [ "$RUN_OFFLINE" = "false" ]; then
     # Install pip requirements for zephyr
     pip3 install --verbose --upgrade --no-cache-dir \
@@ -76,6 +74,8 @@ if [ "$RUN_OFFLINE" = "false" ]; then
         echo "requirements.txt not found (path:'$REQUIREMENTS_TXT'). No action."
     fi
 fi
+
+west zephyr-export
 
 # Execute project specific startup logic, if specified as ON_DOCKER_STARTUP
 if [ -f "$ON_DOCKER_STARTUP" ];

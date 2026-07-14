@@ -102,7 +102,7 @@ RUN apt-get update \
         clang-tidy-20 \
         libfuzzer-20-dev \
         libunwind-20-dev \
-        dotnet-sdk-8.0 \
+        dotnet-sdk-10.0 \
         minicom \
         tmux \
         snmp \
@@ -206,7 +206,7 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/150.0.7871.46/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/150.0.7871.114/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
@@ -234,7 +234,7 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list \
     && sudo apt-get update \
     && sudo apt-get install nodejs --assume-yes \
-    && sudo npm install -g cspell@9.x dts-linter@0.5.x \
+    && sudo npm install -g cspell@10.x dts-linter@0.5.x \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
