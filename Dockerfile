@@ -4,8 +4,8 @@
 #
 FROM ubuntu:24.04 AS probe-rs
 
-ENV RUST_VERSION=1.90.0
-ENV PROBE_RS_VERSION=0.31.0
+ENV RUST_VERSION=1.97.1
+ENV PROBE_RS_VERSION=0.32.0
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo
@@ -206,7 +206,7 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/150.0.7871.114/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/152.0.7977.64/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
@@ -259,12 +259,12 @@ ENV GH_TELEMETRY=false
 # --- Install PowerShell ---
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
-        https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/powershell_7.6.3-1.deb_amd64.deb \
-    && echo "f03200f25c511583c648aecb8d8ce75789db2cf668b39803ee639476d716a3dd powershell_7.6.3-1.deb_amd64.deb" | sha256sum -c - \
+        https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/powershell_7.6.5-1.deb_amd64.deb \
+    && echo "dd683d29a5c95ed43e426f4fe1679469d8b89e78ea955455f6238a0b0e6f1a24 powershell_7.6.5-1.deb_amd64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./powershell_7.6.3-1.deb_amd64.deb \
-    && rm powershell_7.6.3-1.deb_amd64.deb \
+        ./powershell_7.6.5-1.deb_amd64.deb \
+    && rm powershell_7.6.5-1.deb_amd64.deb \
     && rm --recursive --force /var/lib/apt/lists/* \
     && pwsh -Command "Set-PSRepository -InstallationPolicy Trusted -Verbose -Name PSGallery" \
     && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
@@ -274,13 +274,13 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
         --post-data "accept_license_agreement=accepted&submit=Download+software" \
-        https://www.segger.com/downloads/jlink/JLink_Linux_V956_x86_64.deb \
-    && echo "848f1c5c5150857e1945ad070db27c65b0b023432d0123941c6d3d007724cf6d JLink_Linux_V956_x86_64.deb" | sha256sum -c - \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V972_x86_64.deb \
+    && echo "1273b7a981dbb11085c36fac04b567185b062952864fa932a598492fa6f6e4fe JLink_Linux_V972_x86_64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo ln -s /usr/bin/true /usr/bin/udevadm \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./JLink_Linux_V956_x86_64.deb \
-    && rm JLink_Linux_V956_x86_64.deb \
+        ./JLink_Linux_V972_x86_64.deb \
+    && rm JLink_Linux_V972_x86_64.deb \
     && sudo rm -f /usr/bin/udevadm \
     && rm --recursive --force /var/lib/apt/lists/*
 
