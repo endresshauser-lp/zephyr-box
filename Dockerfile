@@ -2,7 +2,7 @@
 # --- Stage 1 ---
 # Build probe-rs
 #
-FROM ubuntu:24.04 AS probe-rs
+FROM ubuntu:26.04 AS probe-rs
 
 ENV RUST_VERSION=1.97.1
 ENV PROBE_RS_VERSION=0.32.0
@@ -33,37 +33,10 @@ RUN wget --quiet --show-progress --progress=dot:giga \
     && cargo install probe-rs-tools@=$PROBE_RS_VERSION --locked --root /opt/probe-rs --features remote
 
 #
-# Backport ccache from Ubuntu 26.04 (build from source for 24.04)
-#
-FROM ubuntu:26.04 AS ccache-source
-
-RUN sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources \
-    && apt-get update \
-    && apt-get install --assume-yes --no-install-recommends dpkg-dev \
-    && apt-get source --download-only ccache \
-    && mv ccache_*.dsc ccache_*.tar.* /tmp/
-
-FROM ubuntu:24.04 AS ccache-backport
-
-COPY --from=ccache-source /tmp/ccache_* /tmp/src/
-
-RUN apt-get update \
-    && apt-get install --assume-yes --no-install-recommends \
-        dpkg-dev \
-        devscripts \
-        equivs \
-    && cd /tmp/src \
-    && dpkg-source --extract ccache_*.dsc /tmp/build \
-    && cd /tmp/build \
-    && mk-build-deps --install --tool "apt-get --assume-yes --no-install-recommends" \
-    && dpkg-buildpackage --unsigned-source --unsigned-changes --build=binary \
-    && mv /tmp/ccache_*.deb /tmp/ccache.deb
-
-#
 # --- Stage 2 ---
 # Build zephyr-box
 #
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ARG ZSDK_VERSION=1.0.1
 
@@ -94,14 +67,14 @@ RUN apt-get update \
         dos2unix \
         unzip \
         cppcheck \
-        llvm-20 \
-        clang-20 \
-        libclang-rt-20-dev \
-        clangd-20 \
-        lldb-20 \
-        clang-tidy-20 \
-        libfuzzer-20-dev \
-        libunwind-20-dev \
+        llvm-22 \
+        clang-22 \
+        libclang-rt-22-dev \
+        clangd-22 \
+        lldb-22 \
+        clang-tidy-22 \
+        libfuzzer-22-dev \
+        libunwind-22-dev \
         dotnet-sdk-10.0 \
         minicom \
         tmux \
@@ -112,7 +85,7 @@ RUN apt-get update \
         less \
     && rm --recursive --force /var/lib/apt/lists/*
 
-ENV PATH="/usr/lib/llvm-20/bin:$PATH"
+ENV PATH="/usr/lib/llvm-22/bin:$PATH"
 
 #
 # --- Configuration ---
@@ -139,6 +112,7 @@ RUN dpkg --add-architecture i386 \
         cmake \
         ninja-build \
         gperf \
+        ccache \
         dfu-util \
         device-tree-compiler \
         wget \
@@ -153,9 +127,9 @@ RUN dpkg --add-architecture i386 \
         make \
         gdb \
         gdbserver \
-        gcc-14 \
-        gcc-14-multilib \
-        g++-14-multilib \
+        gcc-16 \
+        gcc-16-multilib \
+        g++-16-multilib \
         libsdl2-dev \
         libmagic1 \
         libc6-dbg:i386 \
@@ -163,20 +137,11 @@ RUN dpkg --add-architecture i386 \
         exiftool \
         jq \
     && rm --recursive --force /var/lib/apt/lists/* \
-    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-14 50; done \
-    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-14 50; done \
-    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-14 50 \
-    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-14 50 \
+    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/$cmd $cmd /usr/bin/$cmd-16 50; done \
+    && for cmd in cpp g++ gcc gcov gcc-ar gcc-nm gcc-ranlib gcov-dump gcov-tool lto-dump; do update-alternatives --install /usr/bin/x86_64-linux-gnu-$cmd x86_64-linux-gnu-$cmd /usr/bin/x86_64-linux-gnu-$cmd-16 50; done \
+    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-16 50 \
+    && update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-16 50 \
     && ln -s x86_64-linux-gnu/asm /usr/include/asm
-
-#
-# --- Install backported ccache from Ubuntu 26.04 ---
-#
-COPY --from=ccache-backport /tmp/ccache.deb /tmp/ccache.deb
-RUN apt-get update \
-    && apt-get install --assume-yes --no-install-recommends /tmp/ccache.deb \
-    && rm /tmp/ccache.deb \
-    && rm --recursive --force /var/lib/apt/lists/*
 
 #
 # --- Zephyr SDK toolchain ---
