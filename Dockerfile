@@ -61,6 +61,44 @@ RUN apt-get update \
 
 #
 # --- Stage 2 ---
+# Build include-what-you-use
+#
+FROM ubuntu:24.04 AS iwyu
+
+ARG IWYU_VERSION=0.24
+ARG LLVM_VERSION=20
+
+RUN apt-get update \
+    && apt-get upgrade --assume-yes \
+    && apt-get install --assume-yes --no-install-recommends \
+        ca-certificates \
+        wget \
+        cmake \
+        ninja-build \
+        clang-${LLVM_VERSION} \
+        llvm-${LLVM_VERSION}-dev \
+        libclang-${LLVM_VERSION}-dev \
+    && rm --recursive --force /var/lib/apt/lists/*
+
+# Installed into /opt/iwyu; IWYU locates Clang's built-in headers at runtime
+# relative to /usr/lib/llvm-<version>/bin/clang (IWYU_RESOURCE_RELATIVE_TO=clang).
+WORKDIR /tmp/iwyu
+RUN wget --quiet --show-progress --progress=dot:giga --output-document iwyu.tar.gz \
+        https://github.com/include-what-you-use/include-what-you-use/archive/refs/tags/${IWYU_VERSION}.tar.gz \
+    && echo "897b4c864a983f493c8efef4a1a9a2d429fd7ead1011f7a41743ed7b6dbe8c2e iwyu.tar.gz" | sha256sum -c - \
+    && tar --extract --gzip --file iwyu.tar.gz \
+    && cmake -S include-what-you-use-${IWYU_VERSION} -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER=clang-${LLVM_VERSION} \
+        -DCMAKE_CXX_COMPILER=clang++-${LLVM_VERSION} \
+        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-${LLVM_VERSION} \
+        -DCMAKE_INSTALL_PREFIX=/opt/iwyu \
+        -DIWYU_RESOURCE_RELATIVE_TO=clang \
+    && cmake --build build \
+    && cmake --install build
+
+#
+# --- Stage 3 ---
 # Build zephyr-box
 #
 FROM ubuntu:24.04
@@ -288,6 +326,12 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 # --- Install probe-rs ---
 #
 COPY --from=probe-rs /opt/probe-rs/bin/probe-rs /usr/local/bin/probe-rs
+
+#
+# --- Install include-what-you-use ---
+#
+COPY --from=iwyu /opt/iwyu/ /opt/iwyu/
+ENV PATH="/opt/iwyu/bin:$PATH"
 
 #
 # --- Remove 'ubuntu' user and create 'user' user ---
