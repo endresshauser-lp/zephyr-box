@@ -23,8 +23,8 @@ RUN apt-get update \
 
 
 RUN wget --quiet --show-progress --progress=dot:giga \
-        https://static.rust-lang.org/rustup/archive/1.29.0/x86_64-unknown-linux-gnu/rustup-init \
-    && echo "4acc9acc76d5079515b46346a485974457b5a79893cfb01112423c89aeb5aa10 rustup-init" | sha256sum -c - \
+        https://static.rust-lang.org/rustup/archive/1.29.2/x86_64-unknown-linux-gnu/rustup-init \
+    && echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4 rustup-init" | sha256sum -c - \
     && chmod +x rustup-init \
     && ./rustup-init -y --profile minimal --default-toolchain $RUST_VERSION --default-host x86_64-unknown-linux-gnu \
     && rm rustup-init \
@@ -244,7 +244,7 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/152.0.7977.64/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/156.0.8078.47/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
@@ -297,12 +297,12 @@ ENV GH_TELEMETRY=false
 # --- Install PowerShell ---
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
-        https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/powershell_7.6.5-1.deb_amd64.deb \
-    && echo "dd683d29a5c95ed43e426f4fe1679469d8b89e78ea955455f6238a0b0e6f1a24 powershell_7.6.5-1.deb_amd64.deb" | sha256sum -c - \
+        https://github.com/PowerShell/PowerShell/releases/download/v7.6.7/powershell_7.6.7-1.deb_amd64.deb \
+    && echo "868c575f0822b2deed054c1c3c464a9d4b841f67e153369147fb6ace3545c8b2 powershell_7.6.7-1.deb_amd64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./powershell_7.6.5-1.deb_amd64.deb \
-    && rm powershell_7.6.5-1.deb_amd64.deb \
+        ./powershell_7.6.7-1.deb_amd64.deb \
+    && rm powershell_7.6.7-1.deb_amd64.deb \
     && rm --recursive --force /var/lib/apt/lists/* \
     && pwsh -Command "Set-PSRepository -InstallationPolicy Trusted -Verbose -Name PSGallery" \
     && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
@@ -312,13 +312,13 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
         --post-data "accept_license_agreement=accepted&submit=Download+software" \
-        https://www.segger.com/downloads/jlink/JLink_Linux_V972_x86_64.deb \
-    && echo "1273b7a981dbb11085c36fac04b567185b062952864fa932a598492fa6f6e4fe JLink_Linux_V972_x86_64.deb" | sha256sum -c - \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V986a_x86_64.deb \
+    && echo "756b1d3219400340bbf75937fea861b6a5a095374b1f2998d338a93d8391b22a JLink_Linux_V986a_x86_64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo ln -s /usr/bin/true /usr/bin/udevadm \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./JLink_Linux_V972_x86_64.deb \
-    && rm JLink_Linux_V972_x86_64.deb \
+        ./JLink_Linux_V986a_x86_64.deb \
+    && rm JLink_Linux_V986a_x86_64.deb \
     && sudo rm -f /usr/bin/udevadm \
     && rm --recursive --force /var/lib/apt/lists/*
 
