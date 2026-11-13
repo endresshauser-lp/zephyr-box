@@ -244,7 +244,7 @@ RUN apt-get update \
         ./google-chrome-stable_current_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && wget --quiet --show-progress --progress=dot:giga \
-        https://storage.googleapis.com/chrome-for-testing-public/156.0.8078.47/linux64/chromedriver-linux64.zip \
+        https://storage.googleapis.com/chrome-for-testing-public/157.0.8103.78/linux64/chromedriver-linux64.zip \
     && unzip chromedriver-linux64.zip \
     && cp ./chromedriver-linux64/chromedriver /usr/bin/ \
     && rm --recursive ./chromedriver-linux64 \
@@ -263,7 +263,7 @@ RUN apt-get update \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
-# --- install nodejs used for cspell and dts-linter ---
+# --- install nodejs used for cspell, dts-linter and GitHub Copilot CLI ---
 #
 RUN apt-get update \
     && sudo apt-get install ca-certificates curl gnupg --assume-yes \
@@ -272,7 +272,7 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list \
     && sudo apt-get update \
     && sudo apt-get install nodejs --assume-yes \
-    && sudo npm install -g cspell@10.x dts-linter@0.5.x \
+    && sudo npm install -g cspell@10.x dts-linter@0.5.x @github/copilot@1.x \
     && rm --recursive --force /var/lib/apt/lists/*
 
 #
@@ -297,12 +297,12 @@ ENV GH_TELEMETRY=false
 # --- Install PowerShell ---
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
-        https://github.com/PowerShell/PowerShell/releases/download/v7.6.7/powershell_7.6.7-1.deb_amd64.deb \
-    && echo "868c575f0822b2deed054c1c3c464a9d4b841f67e153369147fb6ace3545c8b2 powershell_7.6.7-1.deb_amd64.deb" | sha256sum -c - \
+        https://github.com/PowerShell/PowerShell/releases/download/v7.6.10/powershell_7.6.10-1.deb_amd64.deb \
+    && echo "81a5a944702b116ea74c88b01ba5f1f46b1cd7c42c36d85e1bae90de1230b4d1 powershell_7.6.10-1.deb_amd64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./powershell_7.6.7-1.deb_amd64.deb \
-    && rm powershell_7.6.7-1.deb_amd64.deb \
+        ./powershell_7.6.10-1.deb_amd64.deb \
+    && rm powershell_7.6.10-1.deb_amd64.deb \
     && rm --recursive --force /var/lib/apt/lists/* \
     && pwsh -Command "Set-PSRepository -InstallationPolicy Trusted -Verbose -Name PSGallery" \
     && pwsh -Command "Install-Module -Name PSScriptAnalyzer -Verbose -Scope AllUsers"
@@ -312,13 +312,13 @@ RUN wget --quiet --show-progress --progress=dot:giga \
 #
 RUN wget --quiet --show-progress --progress=dot:giga \
         --post-data "accept_license_agreement=accepted&submit=Download+software" \
-        https://www.segger.com/downloads/jlink/JLink_Linux_V986a_x86_64.deb \
-    && echo "756b1d3219400340bbf75937fea861b6a5a095374b1f2998d338a93d8391b22a JLink_Linux_V986a_x86_64.deb" | sha256sum -c - \
+        https://www.segger.com/downloads/jlink/JLink_Linux_V994_x86_64.deb \
+    && echo "260a1816af070f24b119c1898197dd4e8f6ddda11a584624a7d554196ea26479 JLink_Linux_V994_x86_64.deb" | sha256sum -c - \
     && sudo apt-get update \
     && sudo ln -s /usr/bin/true /usr/bin/udevadm \
     && sudo apt install --assume-yes --no-install-recommends \
-        ./JLink_Linux_V986a_x86_64.deb \
-    && rm JLink_Linux_V986a_x86_64.deb \
+        ./JLink_Linux_V994_x86_64.deb \
+    && rm JLink_Linux_V994_x86_64.deb \
     && sudo rm -f /usr/bin/udevadm \
     && rm --recursive --force /var/lib/apt/lists/*
 
